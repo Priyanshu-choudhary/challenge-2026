@@ -45,7 +45,9 @@ The sheet's **AI_GUIDE** tab tells any assistant the rules (append only, soft de
 
 > Read my Google Sheet "Challenge 2026 Tracker", starting with the AI_GUIDE tab, and follow its rules. Then tell me what to focus on today.
 
-More prompts are at the bottom of the AI_GUIDE tab.
+A full prompt kit (daily, planning, reviews, mock interviews) is in [PROMPTS.md](PROMPTS.md).
+
+Coding agents with a shell can use [tools/c26.mjs](tools/c26.mjs) instead of sheet access: put the web app URL and token in a git-ignored `.c26.json` ({"url": "...", "token": "..."}) and run `node tools/c26.mjs today`. Their edits show in ChangeLog under their own name (set C26_ACTOR, default claude).
 
 ## Development
 

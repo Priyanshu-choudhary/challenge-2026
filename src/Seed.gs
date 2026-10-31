@@ -10,7 +10,7 @@ const TOPICS_ = ['Array', 'String', 'Hashing', 'Two Pointers', 'Sliding Window',
   'Graph', 'Shortest Path', 'DSU', 'Topo Sort', 'DP', 'Greedy', 'Intervals', 'Bit Manipulation', 'Math',
   'Segment Tree', 'String Algo', 'Design', 'Concurrency', 'SQL', 'Other'];
 const PLATFORMS_ = ['LeetCode', 'Codeforces', 'CodeChef', 'AtCoder', 'GFG', 'Other'];
-const SUBJECTS_ = ['Java', 'OOP', 'Threads', 'OS', 'DBMS', 'SQL', 'CN', 'Spring', 'LLD', 'HLD', 'HR'];
+const SUBJECTS_ = ['DSA', 'Java', 'OOP', 'Threads', 'OS', 'DBMS', 'SQL', 'CN', 'Spring', 'LLD', 'HLD', 'HR'];
 
 // Allowed values, also sent to the app for its dropdowns.
 const LISTS_ = {
@@ -341,7 +341,7 @@ const GUIDE_ = [
   ['Tab: Goals', 'Monthly outcomes. id (G-0001), month, area (track values plus Habit), goal, status (todo, doing, done, missed, archived), notes.'],
   ['Tab: Routine', 'The suggested shape of each day type (Weekday, Saturday, Sunday): order, block, what, hours. Rows with block "Tip" are advice.'],
   ['Tab: Problems', 'DSA log and revision queue. id (P-0001), date, platform (LeetCode, Codeforces, CodeChef, AtCoder, GFG, Other), title, link, topic (see the dropdown), difficulty (Easy, Medium, Hard), result (solved = solved alone, hint, solution), key_idea (one line: the trick), stage, next_review, last_grade, reviews, status (active, mastered, archived).'],
-  ['Tab: Cards', 'Interview Q&A flashcards. id (C-0001), subject (Java, OOP, Threads, OS, DBMS, SQL, CN, Spring, LLD, HLD, HR), question, answer (what Yadi would say in an interview, 60 to 90 seconds, with an example), stage, next_review, last_grade, reviews, status, source (me, claude, gemini, course, starter).'],
+  ['Tab: Cards', 'Interview Q&A flashcards. id (C-0001), subject (DSA, Java, OOP, Threads, OS, DBMS, SQL, CN, Spring, LLD, HLD, HR), question, answer (what Yadi would say in an interview, 60 to 90 seconds, with an example), stage, next_review, last_grade, reviews, status, source (me, claude, gemini, course, starter).'],
   ['Tab: DailyLog', 'One row per date. date, hours, dsa_solved, lld_work, third_slot (CS or HLD work), summary, energy (1 to 5), tomorrow.'],
   ['Tab: Mocks', 'Mock and real interviews. id (M-0001), date, type (DSA, LLD, HLD, CS, HR, Full), with, minutes, score (1 to 10), went_well, mistakes, fix, status (active, archived).'],
   ['Tab: Config', 'Settings as key / value. Targets, handles, baseline numbers.'],

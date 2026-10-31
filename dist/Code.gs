@@ -16,6 +16,7 @@ const PREFIX_ = { Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: '
 const APP_TABS_ = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Config'];
 const INTERVALS_ = [1, 3, 7, 14, 30, 60, 120];
 let TZ_ = null;
+let ACTOR_ = 'app'; // who ChangeLog credits; an API caller can name itself (e.g. "claude")
 
 // ---------- connecting a device ----------
 
@@ -89,6 +90,7 @@ function doPost(e) {
     if (!token || req.token !== token) {
       throw new Error('Not connected: this device has no valid token. In the sheet use Challenge 2026 > Connect a device.');
     }
+    ACTOR_ = /^[a-z][a-z0-9-]{0,19}$/.test(req.actor || '') ? req.actor : 'app';
     const api = { getAll: getAll, addRow: addRow, updateRow: updateRow, upsertDay: upsertDay, review: review, getLeetCode: getLeetCode };
     if (!Object.prototype.hasOwnProperty.call(api, req.fn)) throw new Error('Unknown function: ' + req.fn);
     out = { ok: true, result: api[req.fn].apply(null, Array.isArray(req.args) ? req.args : []) };
@@ -263,11 +265,11 @@ function getLeetCode() {
 // ---------- writes ----------
 
 function addRow(tab, obj) {
-  return withLock_(() => addRow_(tab, obj, 'app'));
+  return withLock_(() => addRow_(tab, obj, ACTOR_));
 }
 
 function updateRow(tab, key, patch) {
-  return withLock_(() => updateRow_(tab, key, patch, 'app', patch && patch.status === 'archived' ? 'archive' : 'update'));
+  return withLock_(() => updateRow_(tab, key, patch, ACTOR_, patch && patch.status === 'archived' ? 'archive' : 'update'));
 }
 
 /** DailyLog has one row per date: update it if it exists, otherwise add it. */
@@ -278,9 +280,9 @@ function upsertDay(obj) {
     if (values.some(r => norm_(r[k], 'date') === obj.date)) {
       const patch = Object.assign({}, obj);
       delete patch.date;
-      return updateRow_('DailyLog', obj.date, patch, 'app', 'update');
+      return updateRow_('DailyLog', obj.date, patch, ACTOR_, 'update');
     }
-    return addRow_('DailyLog', obj, 'app');
+    return addRow_('DailyLog', obj, ACTOR_);
   });
 }
 
@@ -303,7 +305,7 @@ function review(tab, id, grade) {
       reviews: (Number(rec.reviews) || 0) + 1,
       status: next.stage >= top ? 'mastered' : 'active',
     };
-    return updateRow_(tab, id, patch, 'app', 'review');
+    return updateRow_(tab, id, patch, ACTOR_, 'review');
   });
 }
 
@@ -356,7 +358,7 @@ function startReview_(tab, rec) {
   } else {
     rec.stage = 0;
     rec.next_review = rec.next_review || addDays_(today_(), 1);
-    rec.source = rec.source || 'me';
+    rec.source = rec.source || (ACTOR_ === 'app' ? 'me' : ACTOR_);
   }
   rec.reviews = 0;
   rec.last_grade = '';
@@ -474,7 +476,7 @@ const TOPICS_ = ['Array', 'String', 'Hashing', 'Two Pointers', 'Sliding Window',
   'Graph', 'Shortest Path', 'DSU', 'Topo Sort', 'DP', 'Greedy', 'Intervals', 'Bit Manipulation', 'Math',
   'Segment Tree', 'String Algo', 'Design', 'Concurrency', 'SQL', 'Other'];
 const PLATFORMS_ = ['LeetCode', 'Codeforces', 'CodeChef', 'AtCoder', 'GFG', 'Other'];
-const SUBJECTS_ = ['Java', 'OOP', 'Threads', 'OS', 'DBMS', 'SQL', 'CN', 'Spring', 'LLD', 'HLD', 'HR'];
+const SUBJECTS_ = ['DSA', 'Java', 'OOP', 'Threads', 'OS', 'DBMS', 'SQL', 'CN', 'Spring', 'LLD', 'HLD', 'HR'];
 
 // Allowed values, also sent to the app for its dropdowns.
 const LISTS_ = {
@@ -805,7 +807,7 @@ const GUIDE_ = [
   ['Tab: Goals', 'Monthly outcomes. id (G-0001), month, area (track values plus Habit), goal, status (todo, doing, done, missed, archived), notes.'],
   ['Tab: Routine', 'The suggested shape of each day type (Weekday, Saturday, Sunday): order, block, what, hours. Rows with block "Tip" are advice.'],
   ['Tab: Problems', 'DSA log and revision queue. id (P-0001), date, platform (LeetCode, Codeforces, CodeChef, AtCoder, GFG, Other), title, link, topic (see the dropdown), difficulty (Easy, Medium, Hard), result (solved = solved alone, hint, solution), key_idea (one line: the trick), stage, next_review, last_grade, reviews, status (active, mastered, archived).'],
-  ['Tab: Cards', 'Interview Q&A flashcards. id (C-0001), subject (Java, OOP, Threads, OS, DBMS, SQL, CN, Spring, LLD, HLD, HR), question, answer (what Yadi would say in an interview, 60 to 90 seconds, with an example), stage, next_review, last_grade, reviews, status, source (me, claude, gemini, course, starter).'],
+  ['Tab: Cards', 'Interview Q&A flashcards. id (C-0001), subject (DSA, Java, OOP, Threads, OS, DBMS, SQL, CN, Spring, LLD, HLD, HR), question, answer (what Yadi would say in an interview, 60 to 90 seconds, with an example), stage, next_review, last_grade, reviews, status, source (me, claude, gemini, course, starter).'],
   ['Tab: DailyLog', 'One row per date. date, hours, dsa_solved, lld_work, third_slot (CS or HLD work), summary, energy (1 to 5), tomorrow.'],
   ['Tab: Mocks', 'Mock and real interviews. id (M-0001), date, type (DSA, LLD, HLD, CS, HR, Full), with, minutes, score (1 to 10), went_well, mistakes, fix, status (active, archived).'],
   ['Tab: Config', 'Settings as key / value. Targets, handles, baseline numbers.'],

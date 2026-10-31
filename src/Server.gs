@@ -18,20 +18,55 @@ let TZ_ = null;
 
 /**
  * The first function in the file, so it is what the editor's Run button runs by default.
- * It prints the connect link (and the URL and token behind it) in the Execution log.
+ * It checks that the web app answers, then prints the connect link in the Execution log.
  */
 function showConnectLink() {
   setup();
-  const url = ScriptApp.getService().getUrl() || '';
-  const token = apiToken_();
-  const isExec = /\/exec$/.test(url);
-  console.log('Web app URL: ' + (url || 'none yet. Deploy > New deployment > Web app, access "Anyone", then run this again.'));
-  if (url && !isExec) console.log('That is not the /exec URL. Copy the /exec URL from Deploy > Manage deployments and paste it with the token on the connect screen.');
-  console.log('Connect token: ' + token);
-  if (isExec) {
-    console.log('Connect link. Open it once on each device and keep it private:\n' +
-      APP_URL_ + '#connect=' + Utilities.base64Encode(JSON.stringify({ u: url, t: token })));
+  const url = webAppUrl_();
+  const check = probeWebApp_(url);
+  console.log('Web app URL: ' + (url || '(none)'));
+  if (check !== 'ok') {
+    console.log('Problem: ' + check);
+    console.log('Fix: in Apps Script open Deploy > Manage deployments, select the Web app deployment and copy its Web app URL ' +
+      '(ends in /exec). In the sheet\'s Config tab put it in the row with key api_url (add that row if it is missing), ' +
+      'make sure "Who has access" is Anyone, then press Run again.');
+    return;
   }
+  console.log('Connect link. Open it once on each device and keep it private:\n' +
+    APP_URL_ + '#connect=' + Utilities.base64Encode(JSON.stringify({ u: url, t: apiToken_() })));
+}
+
+/** Replaces the token, which signs out every connected device. Safe to run from the editor. */
+function newConnectToken() {
+  PropertiesService.getScriptProperties().deleteProperty('API_TOKEN');
+  apiToken_();
+  const msg = 'New connect token created; every device is signed out. Run showConnectLink (or use Connect a device) to get the new link.';
+  console.log(msg);
+  SpreadsheetApp.getActive().toast(msg, 'Challenge 2026', 10);
+}
+
+// ScriptApp.getService().getUrl() can return the editor's test deployment, which answers 404
+// at /exec, so a URL saved in Config (key api_url) wins.
+function webAppUrl_() {
+  const saved = configValue_('api_url');
+  return saved || ScriptApp.getService().getUrl() || '';
+}
+
+function probeWebApp_(url) {
+  if (!url) return 'the script has no web app deployment yet (Deploy > New deployment > Web app).';
+  if (!/\/exec$/.test(url)) return 'the URL does not end in /exec.';
+  let res;
+  try {
+    res = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true });
+  } catch (e) {
+    return 'the URL could not be fetched (' + e.message + ').';
+  }
+  const code = res.getResponseCode();
+  const text = res.getContentText();
+  if (code === 200 && text.indexOf('Challenge 2026 API is running') >= 0) return 'ok';
+  if (code === 404) return 'nothing is deployed at this URL (HTTP 404). It is probably the editor\'s test URL, not your deployment\'s.';
+  if (/accounts\.google\.com|ServiceLogin|Sign in/i.test(text)) return 'the deployment asks visitors to sign in, so its access is not set to Anyone.';
+  return 'the deployment answered HTTP ' + code + ' without the expected text. Publish a new version of the latest code under Manage deployments.';
 }
 
 // ---------- web API ----------
@@ -81,16 +116,10 @@ function openApp() {
 
 function connectDevice() {
   setup();
-  const data = JSON.stringify({ app: APP_URL_, url: ScriptApp.getService().getUrl() || '', token: apiToken_() });
+  const data = JSON.stringify({ app: APP_URL_, url: webAppUrl_(), token: apiToken_() });
   const html = HtmlService.createHtmlOutput(CONNECT_HTML_.replace('%DATA%', () => data.replace(/</g, '\\u003c')))
     .setWidth(480).setHeight(400);
   SpreadsheetApp.getUi().showModalDialog(html, 'Connect a device');
-}
-
-function newConnectToken() {
-  PropertiesService.getScriptProperties().deleteProperty('API_TOKEN');
-  apiToken_();
-  SpreadsheetApp.getUi().alert('New token created. Every connected device is now signed out. Reconnect each one with Challenge 2026 > Connect a device.');
 }
 
 function apiToken_() {

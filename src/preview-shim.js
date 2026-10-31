@@ -81,6 +81,7 @@
     getSpreadsheetTimeZone: function () { return tz; },
     setSpreadsheetTimeZone: function (t) { tz = t; },
     getUrl: function () { return 'https://docs.google.com/spreadsheets/d/PREVIEW/edit'; },
+    toast: function () {},
   };
 
   window.SpreadsheetApp = {
@@ -105,12 +106,18 @@
       return (c === 'x' ? r : (r & 3 | 8)).toString(16);
     });
   };
-  window.ScriptApp = { getService: function () { return { getUrl: function () { return 'https://script.google.com/macros/s/PREVIEW/exec'; } }; } };
+  // Like the real editor, getUrl() hands back the test deployment, which 404s at /exec.
+  window.ScriptApp = { getService: function () { return { getUrl: function () { return 'https://script.google.com/macros/s/HEADTEST/exec'; } }; } };
   window.LockService = { getScriptLock: function () { return { waitLock: function () {}, releaseLock: function () {} }; } };
   var cache = {};
   window.CacheService = { getScriptCache: function () { return { get: function (k) { return cache[k] || null; }, put: function (k, v) { cache[k] = v; } }; } };
   window.UrlFetchApp = {
-    fetch: function () {
+    fetch: function (url) {
+      if (/\/exec$/.test(url)) {
+        // The fake deployment: only the PREVIEW id is "deployed"; anything else is a 404 like the real thing.
+        var live = url === 'https://script.google.com/macros/s/PREVIEW/exec';
+        return { getResponseCode: function () { return live ? 200 : 404; }, getContentText: function () { return live ? window.doGet().getContent() : '<html>404</html>'; } };
+      }
       var body = { data: { matchedUser: { submitStatsGlobal: { acSubmissionNum: [
         { difficulty: 'All', count: 312 }, { difficulty: 'Easy', count: 118 }, { difficulty: 'Medium', count: 165 }, { difficulty: 'Hard', count: 29 }] } },
         userContestRanking: { rating: 1511.4, attendedContestsCount: 23 } } };

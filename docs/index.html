@@ -470,7 +470,8 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
     if (!api) return Promise.reject(authError('This device is not connected yet.'));
     return fetch(api.url, { method: 'POST', body: JSON.stringify({ token: api.token, fn: fn, args: args }) })
       .then(function (r) { return r.text(); }, function () {
-        throw new Error('Could not reach your Apps Script. Check that the web app deployment has access "Anyone" and the URL ends in /exec.');
+        throw new Error('Could not reach your Apps Script. Open the web app URL in a private window: it should say "Challenge 2026 API is running". ' +
+          'If it shows a 404, copy the Web app URL from Deploy > Manage deployments; if it asks you to sign in, set access to Anyone.');
       })
       .then(function (text) {
         var res;

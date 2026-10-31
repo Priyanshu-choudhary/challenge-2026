@@ -318,6 +318,7 @@ const CONFIG_ = [
   ['review_intervals_days', '1,3,7,14,30,60,120', 'Spaced repetition: days until the next review at stage 0 to 6'],
   ['lld_course', 'AlgoMaster LLD (algomaster.io)', 'Problem list mirrors github.com/ashishps1/awesome-low-level-design'],
   ['hld_course', 'AlgoMaster System Design (algomaster.io)', 'Topic list mirrors github.com/ashishps1/awesome-system-design-resources'],
+  ['api_url', '', 'Web app URL from Deploy > Manage deployments (ends in /exec). Used for connect links.'],
   ['lc_solved_now', '', 'Filled in by the app from LeetCode'],
   ['lc_rating_now', '', 'Filled in by the app from LeetCode'],
   ['lc_checked_on', '', 'Filled in by the app from LeetCode'],

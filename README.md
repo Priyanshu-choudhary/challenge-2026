@@ -21,7 +21,11 @@ No data or secrets live in this repository. The page stores the web app URL and 
 2. Pick **setup** in the function menu and press **Run**. Allow access; Google warns that the app isn't verified because it's your own script (**Advanced > Go to project > Allow**). The sheet gets its tabs, the plan and starter interview cards.
 3. **Deploy > New deployment > Web app**. Execute as: **Me**. Who has access: **Anyone**. Deploy.
    Already deployed with "Only myself"? Use **Deploy > Manage deployments > Edit**, choose **New version**, set access to **Anyone**, and deploy. The URL stays the same.
-4. Reload the sheet. In the new **Challenge 2026** menu choose **Connect a device**, check the URL ends in `/exec`, and open the connect link on each device you use (send it to your phone privately).
+4. Get your connect link, either way:
+   - In the Apps Script editor press **Run** (the default function is `showConnectLink`). The **Execution log** prints the web app URL, the token and a ready connect link.
+   - Or reload the sheet and choose **Challenge 2026 > Connect a device**.
+
+   Open the link once on each device you use (send it to your phone privately). If the URL shown ends in `/dev` instead of `/exec`, paste the `/exec` URL from **Manage deployments** and the token into the app's connect screen instead.
 
 Why "Anyone" is safe here: the web app serves no page and no data without the connect token, which is a random 64-character value kept in the script's properties. **Challenge 2026 > New connect token** replaces it and signs out every device.
 

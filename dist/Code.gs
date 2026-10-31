@@ -17,6 +17,26 @@ const APP_TABS_ = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 
 const INTERVALS_ = [1, 3, 7, 14, 30, 60, 120];
 let TZ_ = null;
 
+// ---------- connecting a device ----------
+
+/**
+ * The first function in the file, so it is what the editor's Run button runs by default.
+ * It prints the connect link (and the URL and token behind it) in the Execution log.
+ */
+function showConnectLink() {
+  setup();
+  const url = ScriptApp.getService().getUrl() || '';
+  const token = apiToken_();
+  const isExec = /\/exec$/.test(url);
+  console.log('Web app URL: ' + (url || 'none yet. Deploy > New deployment > Web app, access "Anyone", then run this again.'));
+  if (url && !isExec) console.log('That is not the /exec URL. Copy the /exec URL from Deploy > Manage deployments and paste it with the token on the connect screen.');
+  console.log('Connect token: ' + token);
+  if (isExec) {
+    console.log('Connect link. Open it once on each device and keep it private:\n' +
+      APP_URL_ + '#connect=' + Utilities.base64Encode(JSON.stringify({ u: url, t: token })));
+  }
+}
+
 // ---------- web API ----------
 // Deployed as a web app with access "Anyone", so every request must carry the token
 // kept in Script Properties. No HtmlService page is served publicly, which keeps

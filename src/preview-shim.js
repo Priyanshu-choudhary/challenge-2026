@@ -98,6 +98,14 @@
       return fmt.replace('yyyy', parts.year).replace('MM', parts.month).replace('dd', parts.day).replace('HH', parts.hour).replace('mm', parts.minute);
     },
   };
+  window.Utilities.base64Encode = function (s) { return btoa(s); };
+  window.Utilities.getUuid = function () {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+    });
+  };
+  window.ScriptApp = { getService: function () { return { getUrl: function () { return 'https://script.google.com/macros/s/PREVIEW/exec'; } }; } };
   window.LockService = { getScriptLock: function () { return { waitLock: function () {}, releaseLock: function () {} }; } };
   var cache = {};
   window.CacheService = { getScriptCache: function () { return { get: function (k) { return cache[k] || null; }, put: function (k, v) { cache[k] = v; } }; } };

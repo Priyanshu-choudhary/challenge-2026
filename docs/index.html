@@ -202,6 +202,52 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
 #connect { max-width: 640px; }
 .error-text { color: var(--warn); }
 
+/* Study Timer */
+.timer-box { background: var(--soft); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 18px; margin-top: 14px; text-align: center; }
+.timer-clock { font-size: 56px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; line-height: 1.1; margin: 4px 0 10px; color: var(--ink); }
+.timer-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; padding: 3px 12px; border-radius: 999px; background: var(--card); color: var(--muted); border: 1px solid var(--line); }
+.timer-badge.running { background: var(--ok-soft); color: var(--ok); border-color: rgba(var(--heat), 0.3); }
+.timer-badge.paused { background: var(--warn-soft); color: var(--warn); border-color: rgba(194, 65, 12, 0.3); }
+.timer-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.timer-badge.running .timer-dot { animation: pulse 1.2s infinite; }
+@keyframes pulse { 0% { opacity: 0.3; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.15); } 100% { opacity: 0.3; transform: scale(0.9); } }
+
+.timer-inputs { max-width: 580px; margin: 16px auto 0; display: flex; flex-direction: column; gap: 10px; }
+.timer-name-wrap input { text-align: center; font-size: 15px; font-weight: 500; background: var(--card); border-radius: 999px; padding: 9px 18px; border: 1px solid var(--line); }
+.timer-tracks { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.track-pill { border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; font-size: 12px; font-weight: 600; padding: 3px 12px; cursor: pointer; transition: all 0.15s; }
+.track-pill:hover { border-color: var(--muted); color: var(--ink); }
+.track-pill.on { color: #fff; border-color: transparent; }
+.track-pill.on.tr-DSA { background: var(--t-DSA); }
+.track-pill.on.tr-LLD { background: var(--t-LLD); }
+.track-pill.on.tr-CS { background: var(--t-CS); }
+.track-pill.on.tr-HLD { background: var(--t-HLD); }
+.track-pill.on.tr-Mock { background: var(--t-Mock); }
+.track-pill.on.tr-Job { background: var(--t-Job); }
+.track-pill.on.tr-Review { background: var(--t-Review); }
+
+.timer-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; margin-top: 18px; }
+.timer-controls button.primary { font-size: 15.5px; padding: 9px 24px; border-radius: 999px; }
+.timer-btn-finish { background: var(--ok); border-color: var(--ok); color: #fff; font-weight: 600; font-size: 14.5px; padding: 9px 20px; border-radius: 999px; }
+.timer-btn-finish:hover { filter: brightness(1.08); }
+.timer-presets { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin: 10px 0 0; }
+.timer-presets button { border-radius: 999px; padding: 2px 10px; font-size: 12.5px; }
+.timer-presets button.on { background: var(--card); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+.timer-finish-card { background: var(--card); border: 2px solid var(--ok); border-radius: var(--radius); padding: 18px; margin-top: 14px; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+.timer-today-badge { margin-top: 12px; padding: 10px 14px; border-radius: 10px; background: var(--accent-soft); border: 1px solid rgba(51, 85, 214, 0.2); display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
+
+/* Floating mini-timer */
+.floating-timer { position: fixed; bottom: 20px; right: 24px; z-index: 25; background: var(--card); border: 1px solid var(--line); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16); border-radius: 999px; padding: 6px 14px; display: flex; align-items: center; gap: 12px; transition: transform 0.2s, opacity 0.2s; max-width: calc(100% - 32px); }
+.ft-info { display: flex; align-items: center; gap: 8px; cursor: pointer; min-width: 0; }
+.ft-clock { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ft-name { font-size: 13px; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+.ft-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); animation: pulse 1.2s infinite; flex: none; }
+.ft-dot.paused { background: var(--warn); animation: none; }
+.ft-actions { display: flex; align-items: center; gap: 6px; }
+
 @media (max-width: 860px) {
   .stats { grid-template-columns: repeat(3, 1fr); }
   .cols { grid-template-columns: 1fr; gap: 0; }
@@ -218,6 +264,9 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
   .rows li { grid-template-columns: 1fr auto; }
   .rows .r-date { grid-column: 1 / -1; }
   h1 { font-size: 22px; }
+  .timer-clock { font-size: 42px; }
+  .floating-timer { bottom: 12px; right: 12px; left: 12px; justify-content: space-between; border-radius: 12px; padding: 8px 12px; }
+  .ft-name { max-width: 90px; }
 }
 </style>
 </head>
@@ -256,7 +305,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
   </section>
 
   <nav class="jump">
-    <a href="#today">Today</a><a href="#revise">Revise<b id="nav-due"></b></a><a href="#log">Log</a><a href="#roadmap">Roadmap</a><a href="#history">History</a>
+    <a href="#today">Today</a><a href="#timer" id="nav-timer">Timer<b id="nav-timer-pill"></b></a><a href="#revise">Revise<b id="nav-due"></b></a><a href="#log">Log</a><a href="#roadmap">Roadmap</a><a href="#history">History</a>
   </nav>
 
   <main>
@@ -271,9 +320,97 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
           <h3 id="routine-title">How to run today</h3>
           <ol id="today-routine" class="routine"></ol>
           <div id="today-log"></div>
+          <div id="today-timer-summary"></div>
           <h3 id="goals-title">This month's goals</h3>
           <ul id="today-goals" class="goals"></ul>
         </div>
+      </div>
+    </section>
+
+    <section id="timer" class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Study Timer<span id="timer-badge-head" class="count clear">Ready</span></h2>
+          <span id="timer-sub" class="muted small">Track exact time studying · sessions log automatically</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div class="seg" id="timer-mode-seg">
+            <button class="on" data-act="timer-mode" data-v="stopwatch">Stopwatch</button><button data-act="timer-mode" data-v="countdown">Countdown</button>
+          </div>
+          <button class="ghost small" data-act="manual-session">+ Log past session</button>
+        </div>
+      </div>
+
+      <div id="timer-presets" class="timer-presets" hidden>
+        <span class="muted small">Target:</span>
+        <button class="small on" data-act="set-target" data-mins="25">25m (Pomodoro)</button>
+        <button class="small" data-act="set-target" data-mins="45">45m</button>
+        <button class="small" data-act="set-target" data-mins="50">50m</button>
+        <button class="small" data-act="set-target" data-mins="60">60m</button>
+        <button class="small" data-act="set-target" data-mins="90">90m</button>
+      </div>
+
+      <div class="timer-box">
+        <div>
+          <div id="timer-clock" class="timer-clock">00:00:00</div>
+          <div id="timer-status-badge" class="timer-badge"><span class="timer-dot"></span><span id="timer-status-text">Ready to study</span></div>
+        </div>
+
+        <div class="timer-inputs">
+          <div class="timer-name-wrap">
+            <input type="text" id="timer-name" placeholder="What are you studying? (e.g. DP 2: Knapsack, Java Threads, LLD Parking Lot)" autocomplete="off">
+          </div>
+          <div class="timer-tracks" id="timer-tracks"></div>
+        </div>
+
+        <div class="timer-controls">
+          <button id="btn-timer-primary" class="primary" data-act="timer-toggle">
+            <span id="btn-timer-icon">▶</span> <span id="btn-timer-text">Start studying</span>
+          </button>
+          <button id="btn-timer-finish" class="timer-btn-finish" data-act="timer-finish" hidden>
+            Finish &amp; Save
+          </button>
+          <button id="btn-timer-add5" class="ghost small" data-act="timer-add-time" data-mins="5" title="Add 5 minutes to timer" hidden>
+            +5m
+          </button>
+          <button id="btn-timer-add15" class="ghost small" data-act="timer-add-time" data-mins="15" title="Add 15 minutes to timer" hidden>
+            +15m
+          </button>
+          <button id="btn-timer-discard" class="ghost danger small" data-act="timer-discard" title="Discard this timer" hidden>
+            Discard
+          </button>
+        </div>
+      </div>
+
+      <div id="timer-finish-card" class="timer-finish-card" hidden>
+        <h3>Session Complete! 🎉</h3>
+        <p class="muted small" style="margin:4px 0 12px;">Confirm session details to log your study time.</p>
+        <form id="f-finish-session" class="form" autocomplete="off">
+          <div class="fields">
+            <label class="half">Session name <input name="name" required placeholder="What did you study?"></label>
+            <label>Track <select name="track" data-list="track"></select></label>
+            <label>Duration (minutes) <input name="duration_minutes" type="number" step="0.5" min="0.5" required></label>
+            <label>Date <input name="date" type="date" required></label>
+            <label>Start time <input name="start_time" placeholder="e.g. 08:30 PM"></label>
+            <label>End time <input name="end_time" placeholder="e.g. 09:15 PM"></label>
+            <label class="wide">Key takeaways / notes <textarea name="notes" rows="2" placeholder="Problems solved, key tricks, or topics covered"></textarea></label>
+            <div class="radios wide" style="margin-top:4px;">
+              <label><input type="checkbox" name="add_to_day" id="finish-add-to-day" checked> Add this duration (<span id="finish-hours-text">0.5h</span>) to today's DailyLog</label>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="ghost" data-act="finish-resume">Resume timer</button>
+            <button type="submit" class="primary">Save &amp; Log session</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="margin-top:20px;">
+        <div class="panel-head">
+          <h3>Today's Study Sessions <span id="timer-today-pill" class="count clear">0m</span></h3>
+          <span class="muted small" id="timer-week-stat"></span>
+        </div>
+        <ul id="timer-sessions-list" class="rows"></ul>
       </div>
     </section>
 
@@ -291,7 +428,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       <div class="panel-head">
         <h2>Log</h2>
         <div class="seg" id="log-seg">
-          <button data-act="log-tab" data-v="problem">Problem</button><button data-act="log-tab" data-v="card">Card</button><button data-act="log-tab" data-v="day">Day</button><button data-act="log-tab" data-v="mock">Mock</button>
+          <button data-act="log-tab" data-v="problem">Problem</button><button data-act="log-tab" data-v="card">Card</button><button data-act="log-tab" data-v="day">Day</button><button data-act="log-tab" data-v="mock">Mock</button><button data-act="log-tab" data-v="session">Session</button>
         </div>
       </div>
 
@@ -349,6 +486,25 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
         </div>
         <div class="actions"><span class="muted small" id="mock-note"></span><button class="primary">Log mock</button></div>
       </form>
+
+      <form id="f-session" class="form" data-form="session" autocomplete="off" hidden>
+        <div class="fields">
+          <label class="half">Session name <input name="name" required placeholder="What did you study? (e.g. DP Grids, Java Concurrency)"></label>
+          <label>Track <select name="track" data-list="track"></select></label>
+          <label>Date <input name="date" type="date" required></label>
+          <label>Duration (minutes) <input name="duration_minutes" type="number" min="1" step="0.5" required placeholder="e.g. 45"></label>
+          <label>Start time <input name="start_time" placeholder="e.g. 08:30 PM"></label>
+          <label>End time <input name="end_time" placeholder="e.g. 09:15 PM"></label>
+          <label class="wide">Key takeaways / notes <textarea name="notes" rows="2" placeholder="Problems solved, key concepts, or takeaways"></textarea></label>
+          <div class="radios wide">
+            <label><input type="checkbox" name="add_to_day" checked> Add this duration to today's DailyLog hours</label>
+          </div>
+        </div>
+        <div class="actions">
+          <span class="muted small">Tip: or start the live <a href="#timer" data-act="scroll-to-timer">Study Timer</a> to track exact seconds automatically.</span>
+          <button class="primary">Log session</button>
+        </div>
+      </form>
     </section>
 
     <section id="roadmap" class="panel">
@@ -363,7 +519,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       <div class="panel-head">
         <h2>History</h2>
         <div class="seg" id="hist-seg">
-          <button data-act="hist-tab" data-v="problems">Problems</button><button data-act="hist-tab" data-v="cards">Cards</button><button data-act="hist-tab" data-v="days">Days</button><button data-act="hist-tab" data-v="mocks">Mocks</button>
+          <button data-act="hist-tab" data-v="problems">Problems</button><button data-act="hist-tab" data-v="cards">Cards</button><button data-act="hist-tab" data-v="days">Days</button><button data-act="hist-tab" data-v="mocks">Mocks</button><button data-act="hist-tab" data-v="sessions">Sessions</button>
         </div>
       </div>
       <div id="hist-controls" class="hist-controls"></div>
@@ -389,6 +545,19 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
     </div>
   </form>
 </dialog>
+<div id="floating-timer" class="floating-timer" hidden>
+  <div class="ft-info" data-act="scroll-to-timer" title="Open Study Timer">
+    <span class="ft-dot" id="ft-dot"></span>
+    <span id="ft-clock" class="ft-clock">00:00:00</span>
+    <span id="ft-track" class="tag tr-DSA">DSA</span>
+    <span id="ft-name" class="ft-name">Studying</span>
+  </div>
+  <div class="ft-actions">
+    <button id="ft-btn-toggle" class="small ghost" data-act="timer-toggle">Pause</button>
+    <button class="small primary" data-act="timer-finish">Finish</button>
+    <button class="small ghost" data-act="scroll-to-timer" title="Scroll to Study Timer">↗</button>
+  </div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -396,9 +565,9 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
   'use strict';
 
   var TRACKS = ['DSA', 'LLD', 'CS', 'HLD', 'Mock', 'Job', 'Review'];
-  var TABS = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Config'];
+  var TABS = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config'];
   var RESULT_LABEL = { solved: 'solved alone', hint: 'needed a hint', solution: 'saw the solution' };
-  var NAMES = { Plan: 'task', Goals: 'goal', Problems: 'problem', Cards: 'card', DailyLog: 'day', Mocks: 'mock' };
+  var NAMES = { Plan: 'task', Goals: 'goal', Problems: 'problem', Cards: 'card', DailyLog: 'day', Mocks: 'mock', Sessions: 'study session' };
   // [column, input type, wide?] for the edit dialog
   var FIELDS = {
     Plan: [['task', 'text', 1], ['details', 'textarea', 1], ['track', 'select:track'], ['status', 'select:planStatus'], ['week', 'text'], ['done_on', 'date'], ['start', 'date'], ['end', 'date'], ['notes', 'textarea', 1]],
@@ -407,6 +576,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
     Cards: [['subject', 'select:subject'], ['status', 'select:cardStatus'], ['question', 'textarea', 1], ['answer', 'textarea', 1], ['next_review', 'date'], ['stage', 'number']],
     DailyLog: [['date', 'date'], ['hours', 'number'], ['dsa_solved', 'number'], ['energy', 'number'], ['lld_work', 'text', 1], ['third_slot', 'text', 1], ['summary', 'textarea', 1], ['tomorrow', 'textarea', 1]],
     Mocks: [['date', 'date'], ['type', 'select:mockType'], ['with', 'text'], ['minutes', 'number'], ['score', 'number'], ['status', 'select:mockStatus'], ['went_well', 'textarea', 1], ['mistakes', 'textarea', 1], ['fix', 'textarea', 1]],
+    Sessions: [['name', 'text', 1], ['track', 'select:track'], ['date', 'date'], ['duration_minutes', 'number'], ['start_time', 'text'], ['end_time', 'text'], ['notes', 'textarea', 1], ['status', 'select:sessionStatus']],
   };
 
   var S = {
@@ -442,6 +612,410 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
   function isOpen(k, dflt) { return Object.prototype.hasOwnProperty.call(S.open, k) ? S.open[k] : dflt; }
   function pref(k, d) { try { return localStorage.getItem('c26.' + k) || d; } catch (e) { return d; } }
   function setPref(k, v) { try { localStorage.setItem('c26.' + k, v); } catch (e) { /* storage blocked: keep the in-memory value */ } }
+
+  function fmtHoursMins(mins) {
+    var m = Math.round(num(mins));
+    var h = Math.floor(m / 60);
+    var rem = m % 60;
+    if (h > 0) return h + 'h' + (rem > 0 ? ' ' + rem + 'm' : '');
+    return rem + 'm';
+  }
+  function fmtTime(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    var h = Math.floor(s / 3600);
+    var m = Math.floor((s % 3600) / 60);
+    var sec = s % 60;
+    return (h > 0 ? pad2(h) + ':' : '') + pad2(m) + ':' + pad2(sec);
+  }
+  function fmtTimeOfDay(d) {
+    d = d || new Date();
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return pad2(h) + ':' + pad2(m) + ' ' + ampm;
+  }
+  function playChime() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      var ctx = new AC();
+      var now = ctx.currentTime;
+      var o1 = ctx.createOscillator(), g1 = ctx.createGain();
+      o1.type = 'sine'; o1.frequency.setValueAtTime(587.33, now);
+      g1.gain.setValueAtTime(0.18, now); g1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      o1.connect(g1); g1.connect(ctx.destination);
+      o1.start(now); o1.stop(now + 0.35);
+
+      var o2 = ctx.createOscillator(), g2 = ctx.createGain();
+      o2.type = 'sine'; o2.frequency.setValueAtTime(880, now + 0.18);
+      g2.gain.setValueAtTime(0.2, now + 0.18); g2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      o2.connect(g2); g2.connect(ctx.destination);
+      o2.start(now + 0.18); o2.stop(now + 0.65);
+    } catch (e) {}
+  }
+  function getLocalSessions() {
+    try { var s = localStorage.getItem('c26.studySessions'); return s ? JSON.parse(s) : []; } catch (e) { return []; }
+  }
+  function saveLocalSessions(list) {
+    try { localStorage.setItem('c26.studySessions', JSON.stringify(list)); } catch (e) {}
+  }
+  function saveSessionRecord(rec) {
+    var isNew = !rec.id;
+    if (isNew) {
+      rec.id = 'S-L' + pad2(getLocalSessions().length + 1) + '-' + Date.now().toString(36).slice(-3);
+    }
+    replaceRow('Sessions', rec);
+    var localList = getLocalSessions();
+    var idx = -1;
+    for (var i = 0; i < localList.length; i++) {
+      if (String(localList[i].id) === String(rec.id)) { idx = i; break; }
+    }
+    if (idx >= 0) localList[idx] = rec; else localList.unshift(rec);
+    saveLocalSessions(localList);
+
+    return write(isNew ? 'addRow' : 'updateRow', isNew ? ['Sessions', rec] : ['Sessions', rec.id, rec], function (saved) {
+      return (isNew ? 'Logged session ' : 'Updated session ') + (saved && saved.id ? saved.id : rec.id) + '.';
+    }).then(function (serverRec) {
+      if (serverRec) {
+        replaceRow('Sessions', serverRec);
+        if (isNew && serverRec.id !== rec.id) {
+          for (var j = 0; j < localList.length; j++) {
+            if (localList[j].id === rec.id) { localList[j] = serverRec; break; }
+          }
+          saveLocalSessions(localList);
+        }
+      }
+      renderTimerSessions();
+      renderToday();
+      renderHistList();
+      return serverRec || rec;
+    });
+  }
+
+  function addSessionToDailyLog(durationMins, sessionName) {
+    var t = today();
+    var d = findRow('DailyLog', t) || { date: t, hours: 0, dsa_solved: '', lld_work: '', third_slot: '', summary: '', energy: '', tomorrow: '' };
+    var addedHours = Math.round((num(durationMins) / 60) * 10) / 10;
+    if (addedHours <= 0) return Promise.resolve(null);
+    var currentHours = num(d.hours);
+    var newHours = Math.round((currentHours + addedHours) * 10) / 10;
+    var patch = Object.assign({}, d, { hours: newHours });
+    if (sessionName && (!d.summary || d.summary.indexOf(sessionName) < 0)) {
+      patch.summary = (d.summary ? d.summary + '; ' : '') + sessionName + ' (' + fmtHoursMins(durationMins) + ')';
+    }
+    replaceRow('DailyLog', patch);
+    renderStats();
+    renderToday();
+    renderHistList();
+    if (S.logTab === 'day') refreshDayForm();
+    return write('upsertDay', [patch], 'Added ' + addedHours + 'h to today\'s log (total ' + newHours + 'h).');
+  }
+
+  // ---------- study timer state & actions ----------
+  var TMR = {
+    status: 'idle',
+    startTime: 0,
+    accumulatedMs: 0,
+    name: '',
+    track: 'DSA',
+    mode: 'stopwatch',
+    targetMins: 25,
+    sessionStartTime: '',
+    intervalId: null,
+    targetReachedNotified: false,
+  };
+
+  function loadTimerState() {
+    try {
+      var saved = localStorage.getItem('c26.timer');
+      if (saved) {
+        var o = JSON.parse(saved);
+        TMR.status = o.status || 'idle';
+        TMR.startTime = num(o.startTime);
+        TMR.accumulatedMs = num(o.accumulatedMs);
+        TMR.name = o.name || '';
+        TMR.track = o.track || 'DSA';
+        TMR.mode = o.mode || 'stopwatch';
+        TMR.targetMins = num(o.targetMins) || 25;
+        TMR.sessionStartTime = o.sessionStartTime || '';
+        TMR.targetReachedNotified = !!o.targetReachedNotified;
+      }
+    } catch (e) {}
+    if (TMR.status === 'running') {
+      startTimerInterval();
+    }
+  }
+
+  function saveTimerState() {
+    try {
+      localStorage.setItem('c26.timer', JSON.stringify({
+        status: TMR.status,
+        startTime: TMR.startTime,
+        accumulatedMs: TMR.accumulatedMs,
+        name: TMR.name,
+        track: TMR.track,
+        mode: TMR.mode,
+        targetMins: TMR.targetMins,
+        sessionStartTime: TMR.sessionStartTime,
+        targetReachedNotified: TMR.targetReachedNotified,
+      }));
+    } catch (e) {}
+  }
+
+  function getTimerElapsedMs() {
+    if (TMR.status === 'running') {
+      return (TMR.accumulatedMs || 0) + (Date.now() - TMR.startTime);
+    }
+    return TMR.accumulatedMs || 0;
+  }
+
+  function startTimerInterval() {
+    if (TMR.intervalId) clearInterval(TMR.intervalId);
+    TMR.intervalId = setInterval(updateTimerTick, 300);
+  }
+
+  function stopTimerInterval() {
+    if (TMR.intervalId) {
+      clearInterval(TMR.intervalId);
+      TMR.intervalId = null;
+    }
+  }
+
+  function updateTimerTick() {
+    var elapsed = getTimerElapsedMs();
+    if (TMR.mode === 'countdown') {
+      var targetMs = TMR.targetMins * 60 * 1000;
+      if (elapsed >= targetMs && !TMR.targetReachedNotified) {
+        TMR.targetReachedNotified = true;
+        playChime();
+        toast('Target ' + TMR.targetMins + 'm reached! Awesome study session! 🎉');
+        saveTimerState();
+      }
+    }
+    updateTimerUI();
+  }
+
+  function startTimer() {
+    if (TMR.status === 'running') return;
+    if (TMR.status === 'idle') {
+      TMR.accumulatedMs = 0;
+      TMR.sessionStartTime = fmtTimeOfDay();
+      TMR.targetReachedNotified = false;
+    }
+    TMR.startTime = Date.now();
+    TMR.status = 'running';
+    startTimerInterval();
+    saveTimerState();
+    updateTimerUI();
+  }
+
+  function pauseTimer() {
+    if (TMR.status !== 'running') return;
+    TMR.accumulatedMs = getTimerElapsedMs();
+    TMR.status = 'paused';
+    stopTimerInterval();
+    saveTimerState();
+    updateTimerUI();
+  }
+
+  function toggleTimer() {
+    if (TMR.status === 'running') pauseTimer();
+    else startTimer();
+  }
+
+  function addTimerMinutes(mins) {
+    TMR.accumulatedMs = getTimerElapsedMs() + (mins * 60 * 1000);
+    TMR.startTime = Date.now();
+    saveTimerState();
+    updateTimerUI();
+    toast('Added +' + mins + 'm to study timer.');
+  }
+
+  function discardTimer() {
+    var elapsed = getTimerElapsedMs();
+    if (elapsed > 10000 && !window.confirm('Discard this study session? Tracked time will not be saved.')) return;
+    stopTimerInterval();
+    TMR.status = 'idle';
+    TMR.accumulatedMs = 0;
+    TMR.startTime = 0;
+    TMR.sessionStartTime = '';
+    TMR.targetReachedNotified = false;
+    saveTimerState();
+    updateTimerUI();
+    $('#timer-finish-card').hidden = true;
+    toast('Timer discarded.');
+  }
+
+  function finishTimer() {
+    pauseTimer();
+    var elapsed = getTimerElapsedMs();
+    var mins = Math.max(0.5, Math.round((elapsed / 60000) * 10) / 10);
+    var card = $('#timer-finish-card');
+    card.hidden = false;
+    var f = $('#f-finish-session');
+    f.elements.name.value = TMR.name || (TMR.track + ' Study Session');
+    f.elements.track.value = TMR.track || 'DSA';
+    f.elements.duration_minutes.value = mins;
+    f.elements.date.value = today();
+    f.elements.start_time.value = TMR.sessionStartTime || fmtTimeOfDay(new Date(Date.now() - elapsed));
+    f.elements.end_time.value = fmtTimeOfDay();
+    f.elements.notes.value = '';
+    $('#finish-hours-text').textContent = (Math.round((mins / 60) * 10) / 10) + 'h';
+    card.scrollIntoView({ behavior: 'smooth' });
+    f.elements.name.focus();
+  }
+
+  function updateTimerUI() {
+    var elapsed = getTimerElapsedMs();
+    var clockEl = $('#timer-clock');
+    var badgeEl = $('#timer-status-badge');
+    var badgeText = $('#timer-status-text');
+    var badgeHead = $('#timer-badge-head');
+    var primaryBtn = $('#btn-timer-primary');
+    var primaryIcon = $('#btn-timer-icon');
+    var primaryText = $('#btn-timer-text');
+    var finishBtn = $('#btn-timer-finish');
+    var add5Btn = $('#btn-timer-add5');
+    var add15Btn = $('#btn-timer-add15');
+    var discardBtn = $('#btn-timer-discard');
+    var ftEl = $('#floating-timer');
+    var ftClock = $('#ft-clock');
+    var ftName = $('#ft-name');
+    var ftTrack = $('#ft-track');
+    var ftDot = $('#ft-dot');
+    var ftBtnToggle = $('#ft-btn-toggle');
+    var navPill = $('#nav-timer-pill');
+
+    var dispMs = elapsed;
+    if (TMR.mode === 'countdown') {
+      var targetMs = TMR.targetMins * 60 * 1000;
+      dispMs = Math.max(0, targetMs - elapsed);
+    }
+    var timeStr = fmtTime(dispMs);
+    if (clockEl) clockEl.textContent = timeStr;
+    if (ftClock) ftClock.textContent = timeStr;
+
+    var isRunning = TMR.status === 'running';
+    var isPaused = TMR.status === 'paused';
+    var isIdle = TMR.status === 'idle';
+
+    if (badgeEl) {
+      badgeEl.className = 'timer-badge' + (isRunning ? ' running' : isPaused ? ' paused' : '');
+      if (badgeText) badgeText.textContent = isRunning ? 'Studying...' : isPaused ? 'Paused' : 'Ready to study';
+    }
+    if (badgeHead) {
+      badgeHead.textContent = isRunning ? timeStr : isPaused ? 'Paused' : 'Ready';
+      badgeHead.className = 'count' + (isRunning ? '' : ' clear');
+    }
+
+    if (primaryBtn) {
+      if (primaryIcon) primaryIcon.textContent = isRunning ? '❚❚' : '▶';
+      if (primaryText) primaryText.textContent = isRunning ? 'Pause' : isPaused ? 'Resume' : 'Start studying';
+    }
+
+    if (finishBtn) finishBtn.hidden = isIdle;
+    if (add5Btn) add5Btn.hidden = isIdle;
+    if (add15Btn) add15Btn.hidden = isIdle;
+    if (discardBtn) discardBtn.hidden = isIdle;
+
+    if (ftBtnToggle) ftBtnToggle.textContent = isRunning ? 'Pause' : 'Resume';
+    if (ftDot) ftDot.className = 'ft-dot' + (isPaused ? ' paused' : '');
+    if (ftName) ftName.textContent = TMR.name || 'Studying';
+    if (ftTrack) {
+      ftTrack.textContent = TMR.track;
+      ftTrack.className = 'tag tr-' + TMR.track;
+    }
+
+    if (navPill) {
+      navPill.textContent = isRunning ? timeStr : '';
+    }
+
+    if (isRunning) {
+      document.title = '⏱️ ' + timeStr + ' · ' + (TMR.name || TMR.track) + ' - Challenge 2026';
+    } else if (isPaused) {
+      document.title = '❚❚ ' + timeStr + ' (Paused) - Challenge 2026';
+    } else {
+      document.title = 'Challenge 2026';
+    }
+
+    if (ftEl) {
+      if (isIdle) {
+        ftEl.hidden = true;
+      } else {
+        var timerSec = $('#timer');
+        if (timerSec) {
+          var rect = timerSec.getBoundingClientRect();
+          var inView = (rect.top <= (window.innerHeight || 800)) && (rect.bottom >= 0);
+          ftEl.hidden = inView;
+        } else {
+          ftEl.hidden = false;
+        }
+      }
+    }
+  }
+
+  function renderTimerSessions() {
+    if (!S.tabs) return;
+    var t = today();
+    var allSessions = live(S.tabs.Sessions);
+    var todaySessions = allSessions.filter(function (s) { return s.date === t; });
+    var todayMins = todaySessions.reduce(function (sum, s) { return sum + num(s.duration_minutes); }, 0);
+
+    var mon = addDays(t, -((dow(t) + 6) % 7)), sun = addDays(mon, 6);
+    var weekSessions = allSessions.filter(function (s) { return s.date >= mon && s.date <= sun; });
+    var weekMins = weekSessions.reduce(function (sum, s) { return sum + num(s.duration_minutes); }, 0);
+
+    var pill = $('#timer-today-pill');
+    if (pill) {
+      pill.textContent = fmtHoursMins(todayMins);
+      pill.className = 'count' + (todayMins > 0 ? ' clear' : '');
+    }
+    var weekStat = $('#timer-week-stat');
+    if (weekStat) {
+      weekStat.textContent = 'This week: ' + fmtHoursMins(weekMins) + ' (' + weekSessions.length + ' session' + (weekSessions.length === 1 ? '' : 's') + ')';
+    }
+
+    var listEl = $('#timer-sessions-list');
+    if (!listEl) return;
+    if (!todaySessions.length) {
+      listEl.innerHTML = empty('No study sessions logged today yet. Start the timer above when you begin!');
+      return;
+    }
+    listEl.innerHTML = todaySessions.slice().reverse().map(function (s) {
+      var timeRange = (s.start_time && s.end_time ? s.start_time + ' – ' + s.end_time : s.start_time || '');
+      var sub = [timeRange, s.notes].filter(Boolean).join(' · ');
+      return '<li data-act="edit" data-tab="Sessions" data-id="' + esc(s.id) + '">' +
+        '<span class="r-date">' + esc(s.start_time || 'Today') + '</span>' +
+        '<span class="r-main"><span class="tag tr-' + esc(s.track) + '">' + esc(s.track) + '</span>' + esc(s.name || 'Study Session') +
+        (sub ? '<span class="r-sub">' + esc(sub) + '</span>' : '') + '</span>' +
+        '<span class="r-right"><b>' + fmtHoursMins(s.duration_minutes) + '</b><button class="more" data-act="edit" data-tab="Sessions" data-id="' + esc(s.id) + '" style="margin-left:8px;">Edit</button></span></li>';
+    }).join('');
+  }
+
+  function initTimer() {
+    loadTimerState();
+    var tracksEl = $('#timer-tracks');
+    if (tracksEl) {
+      tracksEl.innerHTML = TRACKS.map(function (tr) {
+        return '<button type="button" class="track-pill tr-' + tr + (tr === TMR.track ? ' on' : '') + '" data-act="timer-select-track" data-track="' + tr + '">' + tr + '</button>';
+      }).join('');
+    }
+    var nameInput = $('#timer-name');
+    if (nameInput) {
+      nameInput.value = TMR.name || '';
+      nameInput.addEventListener('input', function () {
+        TMR.name = nameInput.value.trim();
+        saveTimerState();
+        updateTimerUI();
+      });
+    }
+    $$('#timer-mode-seg button').forEach(function (b) {
+      b.classList.toggle('on', b.dataset.v === TMR.mode);
+    });
+    var presets = $('#timer-presets');
+    if (presets) presets.hidden = TMR.mode !== 'countdown';
+    updateTimerUI();
+  }
 
   // ---------- server calls ----------
   // Inside Apps Script (and the local preview) use google.script.run; on GitHub Pages POST to the
@@ -517,6 +1091,14 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
     return call('getAll').then(function (d) {
       if (!quiet) busy(false);
       TABS.forEach(function (t) { d.tabs[t] = d.tabs[t] || []; });
+      var localSess = getLocalSessions();
+      localSess.forEach(function (ls) {
+        if (!d.tabs.Sessions.some(function (s) { return String(s.id) === String(ls.id); })) {
+          d.tabs.Sessions.push(ls);
+        }
+      });
+      d.lists = d.lists || {};
+      d.lists.sessionStatus = d.lists.sessionStatus || ['active', 'archived'];
       S.tabs = d.tabs;
       S.lists = d.lists || {};
       S.intervals = d.intervals || S.intervals;
@@ -621,7 +1203,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
 
   // ---------- rendering ----------
   function renderAll() {
-    renderHeader(); renderStats(); renderToday(); renderRevise(); renderRoadmap(); renderHistList();
+    renderHeader(); renderStats(); renderToday(); renderTimerSessions(); renderRevise(); renderRoadmap(); renderHistList();
   }
 
   function renderHeader() {
@@ -688,6 +1270,15 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
     $('#today-log').innerHTML = log
       ? '<div class="daylog done"><div><b>Logged ' + esc(log.hours) + 'h today.</b> ' + esc(log.summary || '') + '</div><button class="small" data-act="log-today">Edit</button></div>'
       : '<div class="daylog"><div><b>Today is not logged yet.</b> <span class="muted">It takes 30 seconds and keeps the streak.</span></div><button class="small primary" data-act="log-today">Log today</button></div>';
+
+    var ts = live(S.tabs.Sessions).filter(function (s) { return s.date === t; });
+    var tsMins = ts.reduce(function (sum, s) { return sum + num(s.duration_minutes); }, 0);
+    var timerSummary = $('#today-timer-summary');
+    if (timerSummary) {
+      timerSummary.innerHTML = ts.length
+        ? '<div class="timer-today-badge"><div>⏱️ <b>' + fmtHoursMins(tsMins) + '</b> tracked today across ' + ts.length + ' session' + (ts.length === 1 ? '' : 's') + '.</div><button class="small primary" data-act="scroll-to-timer">Open timer</button></div>'
+        : '<div class="timer-today-badge"><div>⏱️ <b>No study session tracked today.</b> Start the timer to track exact study time.</div><button class="small primary" data-act="scroll-to-timer">Start timer</button></div>';
+    }
 
     // This month's goals, or the next month that has any (e.g. on 31 Oct, show November).
     var gs = live(S.tabs.Goals), month = gs.map(function (g) { return g.month; }).filter(function (m) { return m >= t.slice(0, 7); }).sort()[0];
@@ -778,6 +1369,8 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       c.innerHTML = '<input type="search" id="h-q" placeholder="Search questions and answers"><select id="h-filter"><option value="">All subjects</option>' + opts(S.lists.subject) + '</select><label class="chk"><input type="checkbox" id="h-arch"> show archived</label>';
     } else if (S.histTab === 'mocks') {
       c.innerHTML = '<label class="chk"><input type="checkbox" id="h-arch"> show archived</label>';
+    } else if (S.histTab === 'sessions') {
+      c.innerHTML = '<input type="search" id="h-q" placeholder="Search sessions and notes"><select id="h-filter"><option value="">All tracks</option>' + opts(TRACKS) + '</select><label class="chk"><input type="checkbox" id="h-arch"> show archived</label>';
     } else {
       c.innerHTML = '';
     }
@@ -850,7 +1443,7 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
         var sub = [d.lld_work ? 'LLD: ' + d.lld_work : '', d.third_slot ? 'CS/HLD: ' + d.third_slot : '', d.dsa_solved !== '' && d.dsa_solved != null ? d.dsa_solved + ' DSA' : ''].filter(Boolean).join(' · ');
         return '<li data-act="edit" data-tab="DailyLog" data-id="' + esc(d.date) + '"><span class="r-date">' + esc(fmtD(d.date)) + '</span><span class="r-main">' + esc(d.summary || 'No summary') + '<span class="r-sub">' + esc(sub) + '</span></span><span class="r-right">' + esc(d.hours) + 'h' + (d.energy ? ' · energy ' + esc(d.energy) : '') + '</span></li>';
       }).join('') || empty('No days logged yet.');
-    } else {
+    } else if (tab === 'mocks') {
       var ms = S.tabs.Mocks.filter(shown).sort(byDateDesc('date'));
       var scored = live(S.tabs.Mocks).filter(function (m) { return m.score !== '' && m.score != null; });
       var avg = scored.length ? (scored.reduce(function (s, m) { return s + num(m.score); }, 0) / scored.length).toFixed(1) : '-';
@@ -858,6 +1451,22 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       list.innerHTML = ms.map(function (m) {
         return '<li data-act="edit" data-tab="Mocks" data-id="' + esc(m.id) + '"><span class="r-date">' + esc(fmtD(m.date)) + '</span><span class="r-main">' + esc(m.type) + (m.with ? ' with ' + esc(m.with) : '') + '<span class="r-sub">' + esc(m.mistakes ? 'Mistakes: ' + m.mistakes : m.went_well || '') + '</span></span><span class="r-right">' + (m.score !== '' && m.score != null ? esc(m.score) + '/10' : '') + '</span></li>';
       }).join('') || empty('No mocks logged yet. The first one is planned for W04.');
+    } else if (tab === 'sessions') {
+      var sess = (S.tabs.Sessions || []).filter(function (s) {
+        return shown(s) && (!filter || s.track === filter) && has(s.name + ' ' + (s.notes || '') + ' ' + s.track);
+      }).sort(byDateDesc('date'));
+      var totalMins = live(S.tabs.Sessions).reduce(function (sum, s) { return sum + num(s.duration_minutes); }, 0);
+      var byTrack = {};
+      live(S.tabs.Sessions).forEach(function (s) {
+        byTrack[s.track] = (byTrack[s.track] || 0) + num(s.duration_minutes);
+      });
+      extra.innerHTML = '<p class="small muted">' + live(S.tabs.Sessions).length + ' study sessions logged · ' + fmtHoursMins(totalMins) + ' total study time' +
+        (Object.keys(byTrack).length ? ' (' + Object.keys(byTrack).map(function (k) { return k + ': ' + fmtHoursMins(byTrack[k]); }).join(', ') + ')' : '') + '</p>';
+      list.innerHTML = sess.slice(0, 150).map(function (s) {
+        var sub = [s.track ? s.track : '', (s.start_time && s.end_time ? s.start_time + ' - ' + s.end_time : s.start_time || ''), s.notes].filter(Boolean).join(' · ');
+        var right = s.status === 'archived' ? 'archived' : fmtHoursMins(s.duration_minutes);
+        return '<li data-act="edit" data-tab="Sessions" data-id="' + esc(s.id) + '"><span class="r-date">' + esc(fmtD(s.date)) + '</span><span class="r-main"><span class="tag tr-' + esc(s.track) + '">' + esc(s.track) + '</span>' + esc(s.name || 'Study Session') + '<span class="r-sub">' + esc(sub) + '</span></span><span class="r-right">' + esc(right) + '</span></li>';
+      }).join('') || empty('No study sessions match.');
     }
   }
 
@@ -950,6 +1559,9 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       var w = weeks().filter(function (x) { return x.week === ds.week; })[0] || {};
       return { week: ds.week, start: w.start || '', end: w.end || '', track: 'DSA', status: 'todo', task: '', details: '', notes: '', done_on: '' };
     }
+    if (ds.tab === 'Sessions') {
+      return { name: '', track: 'DSA', date: today(), duration_minutes: 30, start_time: '', end_time: '', notes: '', status: 'active' };
+    }
     return { month: ds.month, area: 'DSA', status: 'todo', goal: '', notes: '' };
   }
 
@@ -987,7 +1599,8 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
     var pf = $('#f-problem');
     pf.elements.platform.value = 'LeetCode';
     pf.elements.difficulty.value = 'Medium';
-    ['#f-problem', '#f-day', '#f-mock'].forEach(function (s) { $(s).elements.date.value = today(); });
+    ['#f-problem', '#f-day', '#f-mock', '#f-session'].forEach(function (s) { var el = $(s); if (el && el.elements && el.elements.date) el.elements.date.value = today(); });
+    initTimer();
     renderHistControls();
     showLogTab(S.logTab);
     updateProblemNote();
@@ -1044,6 +1657,39 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       else if (a === 'hist-tab') { S.histTab = ds.v; setPref('histTab', ds.v); renderHistControls(); renderHistList(); }
       else if (a === 'log-today') { $('#f-day').elements.date.value = today(); showLogTab('day'); $('#log').scrollIntoView(); }
       else if (a === 'refresh') { load(); S.lc = null; loadLC(); }
+      else if (a === 'timer-toggle') toggleTimer();
+      else if (a === 'timer-finish') finishTimer();
+      else if (a === 'timer-discard') discardTimer();
+      else if (a === 'timer-add-time') addTimerMinutes(num(ds.mins));
+      else if (a === 'timer-mode') {
+        TMR.mode = ds.v;
+        $$('#timer-mode-seg button').forEach(function (b) { b.classList.toggle('on', b.dataset.v === ds.v); });
+        $('#timer-presets').hidden = ds.v !== 'countdown';
+        saveTimerState();
+        updateTimerUI();
+      }
+      else if (a === 'set-target') {
+        TMR.targetMins = num(ds.mins);
+        $$('#timer-presets button').forEach(function (b) { b.classList.toggle('on', num(b.dataset.mins) === TMR.targetMins); });
+        saveTimerState();
+        updateTimerUI();
+        toast('Target set to ' + ds.mins + ' minutes.');
+      }
+      else if (a === 'timer-select-track') {
+        TMR.track = ds.track;
+        $$('.track-pill').forEach(function (p) { p.classList.toggle('on', p.dataset.track === ds.track); });
+        saveTimerState();
+        updateTimerUI();
+      }
+      else if (a === 'manual-session') openEditor('Sessions', null, newDefaults({ tab: 'Sessions' }));
+      else if (a === 'scroll-to-timer') {
+        var tEl = $('#timer');
+        if (tEl) tEl.scrollIntoView({ behavior: 'smooth' });
+      }
+      else if (a === 'finish-resume') {
+        $('#timer-finish-card').hidden = true;
+        startTimer();
+      }
     });
     document.addEventListener('toggle', function (e) {
       var d = e.target;
@@ -1119,6 +1765,54 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       });
     });
 
+    var ff = $('#f-finish-session');
+    if (ff) {
+      ff.elements.duration_minutes.addEventListener('input', function () {
+        var m = num(ff.elements.duration_minutes.value);
+        $('#finish-hours-text').textContent = (Math.round((m / 60) * 10) / 10) + 'h';
+      });
+      ff.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = formVals(ff);
+        var addToDay = $('#finish-add-to-day') ? $('#finish-add-to-day').checked : false;
+        $('#timer-finish-card').hidden = true;
+        saveSessionRecord(v).then(function () {
+          if (addToDay) {
+            addSessionToDailyLog(v.duration_minutes, v.name);
+          }
+          stopTimerInterval();
+          TMR.status = 'idle';
+          TMR.accumulatedMs = 0;
+          TMR.startTime = 0;
+          TMR.sessionStartTime = '';
+          TMR.name = '';
+          var nameInput = $('#timer-name');
+          if (nameInput) nameInput.value = '';
+          saveTimerState();
+          updateTimerUI();
+        });
+      });
+    }
+
+    var sf = $('#f-session');
+    if (sf) {
+      sf.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var v = formVals(sf);
+        var addToDay = sf.elements.add_to_day ? sf.elements.add_to_day.checked : false;
+        saveSessionRecord(v).then(function () {
+          if (addToDay) {
+            addSessionToDailyLog(v.duration_minutes, v.name);
+          }
+          sf.reset();
+          sf.elements.date.value = today();
+          sf.elements.track.value = v.track || 'DSA';
+        });
+      });
+    }
+
+    window.addEventListener('scroll', updateTimerUI, { passive: true });
+
     $('#dlg-form').addEventListener('submit', function (e) {
       e.preventDefault();
       var d = S.dlg;
@@ -1126,7 +1820,11 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       var v = formVals($('#dlg-form'));
       closeDlg();
       if (d.isNew) {
-        if (!v.task && !v.goal) { toast('Nothing to add: the text was empty.', true); return; }
+        if (!v.task && !v.goal && !v.name) { toast('Nothing to add: the text was empty.', true); return; }
+        if (d.tab === 'Sessions') {
+          saveSessionRecord(Object.assign({}, d.row, v));
+          return;
+        }
         write('addRow', [d.tab, Object.assign({}, d.row, v)], function (r) { return 'Added ' + r.id + '.'; }).then(function (rec) {
           if (rec) { S.tabs[d.tab].push(rec); renderAll(); }
         });
@@ -1141,6 +1839,10 @@ footer { margin-top: 18px; font-size: 13px; color: var(--muted); display: flex; 
       if (d.tab === 'Plan' && patch.status === 'done' && !('done_on' in patch) && !d.row.done_on) patch.done_on = today();
       Object.assign(d.row, patch);
       renderAll();
+      if (d.tab === 'Sessions') {
+        saveSessionRecord(d.row);
+        return;
+      }
       if (d.tab === 'DailyLog' && S.logTab === 'day') refreshDayForm();
       write('updateRow', [d.tab, d.id, patch], 'Saved.');
     });

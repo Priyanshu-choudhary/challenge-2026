@@ -32,10 +32,11 @@ Why "Anyone" is safe here: the web app serves no page and no data without the co
 ## Daily use
 
 - **Today:** this week's tasks, how to shape the day, whether today is logged, this month's goals.
+- **Timer:** live study stopwatch / countdown to track exact study time with session naming, track selection, +5m/+15m adjustments, pause/resume, automatic sync to today's DailyLog hours, and floating mini-timer while navigating.
 - **Revise:** problems and cards that are due. Recall, reveal, grade Again / Hard / Good / Easy; the next review lands 1, 3, 7, 14, 30, 60 or 120 days out.
-- **Log:** a problem (paste a LeetCode link and the title fills in), a card, the day, or a mock interview.
+- **Log:** a problem (paste a LeetCode link and the title fills in), a card, the day, a mock interview, or a past study session.
 - **Roadmap:** every week and month with progress; add or edit tasks and goals.
-- **History:** problems with a weak-topic chart, cards, a 5-week hours heatmap, mocks.
+- **History:** problems with a weak-topic chart, cards, a 5-week hours heatmap, mocks, and study sessions with track breakdown.
 
 Nothing is deleted from the app: **Archive** sets a row's status to `archived` and offers Undo.
 

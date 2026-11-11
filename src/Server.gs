@@ -8,9 +8,9 @@
  */
 
 const APP_URL_ = 'https://priyanshu-choudhary.github.io/challenge-2026/';
-const KEYS_ = { Plan: 'id', Goals: 'id', Problems: 'id', Cards: 'id', Mocks: 'id', DailyLog: 'date', Config: 'key' };
-const PREFIX_ = { Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: 'M-' };
-const APP_TABS_ = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Config'];
+const KEYS_ = { Plan: 'id', Goals: 'id', Problems: 'id', Cards: 'id', Mocks: 'id', Sessions: 'id', DailyLog: 'date', Config: 'key' };
+const PREFIX_ = { Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: 'M-', Sessions: 'S-' };
+const APP_TABS_ = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config'];
 const INTERVALS_ = [1, 3, 7, 14, 30, 60, 120];
 let TZ_ = null;
 let ACTOR_ = 'app'; // who ChangeLog credits; an API caller can name itself (e.g. "claude")

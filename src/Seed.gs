@@ -2,7 +2,7 @@
 // monthly goals, the daily routine, starter interview cards and settings.
 // setup() writes these only into tabs that don't exist yet, so your data is never overwritten.
 
-const TAB_ORDER_ = ['AI_GUIDE', 'Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Config', 'ChangeLog'];
+const TAB_ORDER_ = ['AI_GUIDE', 'Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config', 'ChangeLog'];
 
 const TRACKS_ = ['DSA', 'LLD', 'CS', 'HLD', 'Mock', 'Job', 'Review'];
 const TOPICS_ = ['Array', 'String', 'Hashing', 'Two Pointers', 'Sliding Window', 'Binary Search', 'Prefix Sum',
@@ -28,6 +28,7 @@ const LISTS_ = {
   cardStatus: ['active', 'mastered', 'archived'],
   mockType: ['DSA', 'LLD', 'HLD', 'CS', 'HR', 'Full'],
   mockStatus: ['active', 'archived'],
+  sessionStatus: ['active', 'archived'],
   dayType: ['Weekday', 'Saturday', 'Sunday'],
 };
 
@@ -70,6 +71,11 @@ const SCHEMA_ = {
     headers: ['id', 'date', 'type', 'with', 'minutes', 'score', 'went_well', 'mistakes', 'fix', 'status'],
     widths: [70, 95, 70, 120, 70, 60, 300, 300, 300, 80], dates: ['date'], wrap: ['went_well', 'mistakes', 'fix'],
     lists: { type: LISTS_.mockType, status: LISTS_.mockStatus }, color: '#c5221f',
+  },
+  Sessions: {
+    headers: ['id', 'date', 'name', 'track', 'duration_minutes', 'start_time', 'end_time', 'notes', 'status'],
+    widths: [70, 95, 240, 80, 90, 80, 80, 320, 80], dates: ['date'], wrap: ['name', 'notes'],
+    lists: { track: LISTS_.track, status: LISTS_.sessionStatus }, color: '#0e7f8f',
   },
   Config: { headers: ['key', 'value', 'note'], widths: [190, 260, 460], text: ['value'], wrap: ['note'], color: '#80868b' },
   ChangeLog: {
@@ -344,6 +350,7 @@ const GUIDE_ = [
   ['Tab: Cards', 'Interview Q&A flashcards. id (C-0001), subject (DSA, Java, OOP, Threads, OS, DBMS, SQL, CN, Spring, LLD, HLD, HR), question, answer (what Yadi would say in an interview, 60 to 90 seconds, with an example), stage, next_review, last_grade, reviews, status, source (me, claude, gemini, course, starter).'],
   ['Tab: DailyLog', 'One row per date. date, hours, dsa_solved, lld_work, third_slot (CS or HLD work), summary, energy (1 to 5), tomorrow.'],
   ['Tab: Mocks', 'Mock and real interviews. id (M-0001), date, type (DSA, LLD, HLD, CS, HR, Full), with, minutes, score (1 to 10), went_well, mistakes, fix, status (active, archived).'],
+  ['Tab: Sessions', 'Logged study sessions from the study timer or manual entry. id (S-0001), date, name (topic/problem studied), track (DSA, LLD, CS, HLD, Mock, Job, Review), duration_minutes, start_time, end_time, notes, status (active, archived).'],
   ['Tab: Config', 'Settings as key / value. Targets, handles, baseline numbers.'],
   ['Tab: ChangeLog', 'Audit trail of every change by the app or an AI. Append only.'],
   ['New problem', 'When adding a Problems row: result "solved" -> stage 1, next_review = date + 3 days. Result "hint" or "solution" -> stage 0, next_review = date + 1 day. reviews 0, status active, last_grade empty.'],

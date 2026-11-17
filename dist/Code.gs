@@ -11,9 +11,9 @@
  */
 
 const APP_URL_ = 'https://priyanshu-choudhary.github.io/challenge-2026/';
-const KEYS_ = { Plan: 'id', Goals: 'id', Problems: 'id', Cards: 'id', Mocks: 'id', Sessions: 'id', DailyLog: 'date', Config: 'key' };
-const PREFIX_ = { Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: 'M-', Sessions: 'S-' };
-const APP_TABS_ = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config'];
+const KEYS_ = { Checklist: 'id', Plan: 'id', Goals: 'id', Problems: 'id', Cards: 'id', Mocks: 'id', Sessions: 'id', DailyLog: 'date', Config: 'key' };
+const PREFIX_ = { Checklist: 'D-', Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: 'M-', Sessions: 'S-' };
+const APP_TABS_ = ['Checklist', 'Checks', 'Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config'];
 const INTERVALS_ = [1, 3, 7, 14, 30, 60, 120];
 let TZ_ = null;
 let ACTOR_ = 'app'; // who ChangeLog credits; an API caller can name itself (e.g. "claude")
@@ -91,7 +91,8 @@ function doPost(e) {
       throw new Error('Not connected: this device has no valid token. In the sheet use Challenge 2026 > Connect a device.');
     }
     ACTOR_ = /^[a-z][a-z0-9-]{0,19}$/.test(req.actor || '') ? req.actor : 'app';
-    const api = { getAll: getAll, addRow: addRow, updateRow: updateRow, upsertDay: upsertDay, review: review, getLeetCode: getLeetCode };
+    const api = { getAll: getAll, addRow: addRow, updateRow: updateRow, upsertDay: upsertDay, review: review, getLeetCode: getLeetCode,
+      setCheck: setCheck, setTimer: setTimer };
     if (!Object.prototype.hasOwnProperty.call(api, req.fn)) throw new Error('Unknown function: ' + req.fn);
     out = { ok: true, result: api[req.fn].apply(null, Array.isArray(req.args) ? req.args : []) };
   } catch (err) {
@@ -286,6 +287,36 @@ function upsertDay(obj) {
   });
 }
 
+/** Ticks or unticks a checklist item for a date. Checks has one row per (date, item_id). */
+function setCheck(date, itemId, done) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) throw new Error('Bad date: ' + date);
+  return withLock_(() => {
+    const items = readTab_('Checklist');
+    const ik = items.headers.indexOf('id');
+    const itemRow = items.values.find(r => String(r[ik]).trim() === String(itemId));
+    if (!itemRow) throw new Error('Checklist has no item ' + itemId + '. Reload the app.');
+    const item = toObj_(items.headers, itemRow);
+    const { sh, headers, values } = readTab_('Checks');
+    const dk = headers.indexOf('date'), kk = headers.indexOf('item_id');
+    const i = values.findIndex(r => norm_(r[dk], 'date') === date && String(r[kk]).trim() === String(itemId));
+    const rec = { date: date, item_id: itemId, category: item.category, item: item.item, done: !!done,
+      done_at: done ? "'" + Utilities.formatDate(new Date(), tz_(), 'HH:mm') : '' };
+    if (i < 0) sh.appendRow(headers.map(h => clean_(rec[h])));
+    else headers.forEach((h, c) => { if (h === 'done' || h === 'done_at') sh.getRange(i + 2, c + 1).setValue(rec[h]); });
+    log_(ACTOR_, done ? 'check' : 'uncheck', 'Checks', itemId, date + ' ' + item.item);
+    rec.done_at = String(rec.done_at).replace(/^'/, '');
+    return rec;
+  });
+}
+
+/** Saves the shared study timer (a small JSON object) so every device sees the same timer. */
+function setTimer(state) {
+  return withLock_(() => {
+    setConfig_('timer', JSON.stringify(state || {}));
+    return state;
+  });
+}
+
 /** Spaced-repetition review of a problem or card. grade: again | hard | good | easy. */
 function review(tab, id, grade) {
   if (tab !== 'Problems' && tab !== 'Cards') throw new Error('Only Problems and Cards can be reviewed');
@@ -468,9 +499,11 @@ function pad_(n) {
 // monthly goals, the daily routine, starter interview cards and settings.
 // setup() writes these only into tabs that don't exist yet, so your data is never overwritten.
 
-const TAB_ORDER_ = ['AI_GUIDE', 'Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config', 'ChangeLog'];
+const TAB_ORDER_ = ['AI_GUIDE', 'Checklist', 'Checks', 'Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config', 'ChangeLog'];
 
 const TRACKS_ = ['DSA', 'LLD', 'CS', 'HLD', 'Mock', 'Job', 'Review'];
+// Checklist and timer categories.
+const CATEGORIES_ = ['Revision', 'DSA', 'LLD', 'Concurrency', 'Other'];
 const TOPICS_ = ['Array', 'String', 'Hashing', 'Two Pointers', 'Sliding Window', 'Binary Search', 'Prefix Sum',
   'Stack', 'Monotonic Stack', 'Queue', 'Linked List', 'Recursion', 'Backtracking', 'Tree', 'BST', 'Heap', 'Trie',
   'Graph', 'Shortest Path', 'DSU', 'Topo Sort', 'DP', 'Greedy', 'Intervals', 'Bit Manipulation', 'Math',
@@ -480,6 +513,10 @@ const SUBJECTS_ = ['DSA', 'Java', 'OOP', 'Threads', 'OS', 'DBMS', 'SQL', 'CN', '
 
 // Allowed values, also sent to the app for its dropdowns.
 const LISTS_ = {
+  category: CATEGORIES_,
+  repeat: ['daily', 'once'],
+  itemStatus: ['active', 'archived'],
+  sessionTrack: CATEGORIES_.concat(TRACKS_.filter(t => CATEGORIES_.indexOf(t) < 0)),
   track: TRACKS_,
   planStatus: ['todo', 'doing', 'done', 'skipped', 'archived'],
   goalStatus: ['todo', 'doing', 'done', 'missed', 'archived'],
@@ -501,6 +538,15 @@ const LISTS_ = {
 // widths in px; dates get yyyy-mm-dd, text columns are stored as plain text, lists become dropdowns.
 const SCHEMA_ = {
   AI_GUIDE: { headers: ['section', 'text'], widths: [170, 900], wrap: ['text'], color: '#5f6368' },
+  Checklist: {
+    headers: ['id', 'category', 'item', 'repeat', 'start', 'end', 'status'],
+    widths: [70, 100, 420, 70, 95, 95, 80], dates: ['start', 'end'], wrap: ['item'], color: '#1f8a4c',
+    lists: { category: CATEGORIES_, repeat: ['daily', 'once'], status: ['active', 'archived'] },
+  },
+  Checks: {
+    headers: ['date', 'item_id', 'category', 'item', 'done', 'done_at'],
+    widths: [95, 70, 100, 420, 60, 70], dates: ['date'], text: ['item_id', 'done_at'], wrap: ['item'], color: '#34a853',
+  },
   Plan: {
     headers: ['id', 'week', 'start', 'end', 'track', 'task', 'details', 'status', 'done_on', 'notes'],
     widths: [70, 60, 95, 95, 70, 330, 560, 75, 95, 240], dates: ['start', 'end', 'done_on'], text: ['week'],
@@ -541,7 +587,7 @@ const SCHEMA_ = {
   Sessions: {
     headers: ['id', 'date', 'name', 'track', 'duration_minutes', 'start_time', 'end_time', 'notes', 'status'],
     widths: [70, 95, 240, 80, 90, 80, 80, 320, 80], dates: ['date'], wrap: ['name', 'notes'],
-    lists: { track: LISTS_.track, status: LISTS_.sessionStatus }, color: '#0e7f8f',
+    lists: { track: LISTS_.sessionTrack, status: LISTS_.sessionStatus }, color: '#0e7f8f',
   },
   Config: { headers: ['key', 'value', 'note'], widths: [190, 260, 460], text: ['value'], wrap: ['note'], color: '#80868b' },
   ChangeLog: {
@@ -549,6 +595,14 @@ const SCHEMA_ = {
     widths: [130, 80, 80, 90, 80, 560], text: ['time'], wrap: ['summary'], color: '#80868b',
   },
 };
+
+// [category, item]: the starting daily checklist. Edit it in the app.
+const CHECKLIST_ = [
+  ['Revision', 'Revise problems and cards that are due'],
+  ['DSA', 'Solve DSA problems'],
+  ['LLD', 'Solve 1 LLD question'],
+  ['Concurrency', 'Study 1 concurrency topic or problem'],
+];
 
 const CONTEST_ = ['DSA', 'LeetCode contests: Weekly (Sun 8:00 AM IST) and Biweekly (Sat 8:00 PM IST) if one falls this week',
   'Aim for Q1 to Q3 inside the contest. Upsolve the rest the same day and log every problem you touched.'];
@@ -790,6 +844,7 @@ const CONFIG_ = [
   ['review_intervals_days', '1,3,7,14,30,60,120', 'Spaced repetition: days until the next review at stage 0 to 6'],
   ['lld_course', 'AlgoMaster LLD (algomaster.io)', 'Problem list mirrors github.com/ashishps1/awesome-low-level-design'],
   ['hld_course', 'AlgoMaster System Design (algomaster.io)', 'Topic list mirrors github.com/ashishps1/awesome-system-design-resources'],
+  ['timer', '', 'The shared study timer, written by the app. Leave it alone.'],
   ['api_url', '', 'Web app URL from Deploy > Manage deployments (ends in /exec). Used for connect links.'],
   ['lc_solved_now', '', 'Filled in by the app from LeetCode'],
   ['lc_rating_now', '', 'Filled in by the app from LeetCode'],
@@ -809,6 +864,8 @@ const GUIDE_ = [
   ['Rule 7', 'After every change, append one row to ChangeLog: time (YYYY-MM-DD HH:MM, IST), actor (claude, gemini, chatgpt, ...), action (add, update, archive), tab, row_id, and a short summary.'],
   ['Rule 8', 'Ask Yadi before changing more than 20 rows at once, and before moving Plan dates or editing Goals.'],
   ['Undo', 'File > Version history in Google Sheets restores any earlier version. ChangeLog shows who changed what.'],
+  ['Tab: Checklist', 'The daily to-do list the app shows. id (D-0001), category (Revision, DSA, LLD, Concurrency, Other), item, repeat (daily = every day from start until end; once = only on start), start, end (empty = no end), status (active, archived). To retire a daily item set end to yesterday; never delete it, so past days keep their history.'],
+  ['Tab: Checks', 'One row per ticked item per day: date, item_id (a Checklist id), category, item (copied text), done (TRUE/FALSE), done_at (HH:MM). Use the app to tick items; if you add rows by hand, keep date + item_id unique.'],
   ['Tab: Plan', 'Weekly tasks. id (T-0001), week (W00 to W13, then FEB to MAY), start, end, track, task, details, status, done_on, notes. track: DSA, LLD, CS, HLD, Mock, Job, Review. status: todo, doing, done, skipped, archived. When marking done, also set done_on.'],
   ['Tab: Goals', 'Monthly outcomes. id (G-0001), month, area (track values plus Habit), goal, status (todo, doing, done, missed, archived), notes.'],
   ['Tab: Routine', 'The suggested shape of each day type (Weekday, Saturday, Sunday): order, block, what, hours. Rows with block "Tip" are advice.'],
@@ -816,7 +873,7 @@ const GUIDE_ = [
   ['Tab: Cards', 'Interview Q&A flashcards. id (C-0001), subject (DSA, Java, OOP, Threads, OS, DBMS, SQL, CN, Spring, LLD, HLD, HR), question, answer (what Yadi would say in an interview, 60 to 90 seconds, with an example), stage, next_review, last_grade, reviews, status, source (me, claude, gemini, course, starter).'],
   ['Tab: DailyLog', 'One row per date. date, hours, dsa_solved, lld_work, third_slot (CS or HLD work), summary, energy (1 to 5), tomorrow.'],
   ['Tab: Mocks', 'Mock and real interviews. id (M-0001), date, type (DSA, LLD, HLD, CS, HR, Full), with, minutes, score (1 to 10), went_well, mistakes, fix, status (active, archived).'],
-  ['Tab: Sessions', 'Logged study sessions from the study timer or manual entry. id (S-0001), date, name (topic/problem studied), track (DSA, LLD, CS, HLD, Mock, Job, Review), duration_minutes, start_time, end_time, notes, status (active, archived).'],
+  ['Tab: Sessions', 'Logged study sessions from the study timer or manual entry. id (S-0001), date, name (topic/problem studied), track (Revision, DSA, LLD, Concurrency, Other; older rows may use CS, HLD, Mock, Job, Review), duration_minutes, start_time, end_time, notes, status (active, archived).'],
   ['Tab: Config', 'Settings as key / value. Targets, handles, baseline numbers.'],
   ['Tab: ChangeLog', 'Audit trail of every change by the app or an AI. Append only.'],
   ['New problem', 'When adding a Problems row: result "solved" -> stage 1, next_review = date + 3 days. Result "hint" or "solution" -> stage 0, next_review = date + 1 day. reviews 0, status active, last_grade empty.'],
@@ -841,6 +898,7 @@ function planRows_() {
 function seedRows_(name) {
   switch (name) {
     case 'AI_GUIDE': return GUIDE_;
+    case 'Checklist': return CHECKLIST_.map((c, i) => ['D-' + pad_(i + 1), c[0], c[1], 'daily', '2026-11-01', '', 'active']);
     case 'Plan': return planRows_();
     case 'Goals': return GOALS_.map((g, i) => ['G-' + pad_(i + 1), g[0], g[1], g[2], 'todo', '']);
     case 'Routine': return ROUTINE_;

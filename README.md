@@ -31,14 +31,14 @@ Why "Anyone" is safe here: the web app serves no page and no data without the co
 
 ## Daily use
 
-- **Today:** this week's tasks, how to shape the day, whether today is logged, this month's goals.
-- **Timer:** live study stopwatch / countdown to track exact study time with session naming, track selection, +5m/+15m adjustments, pause/resume, automatic sync to today's DailyLog hours, and floating mini-timer while navigating.
-- **Revise:** problems and cards that are due. Recall, reveal, grade Again / Hard / Good / Easy; the next review lands 1, 3, 7, 14, 30, 60 or 120 days out.
-- **Log:** a problem (paste a LeetCode link and the title fills in), a card, the day, a mock interview, or a past study session.
-- **Roadmap:** every week and month with progress; add or edit tasks and goals.
-- **History:** problems with a weak-topic chart, cards, a 5-week hours heatmap, mocks, and study sessions with track breakdown.
+The page is one screen:
 
-Nothing is deleted from the app: **Archive** sets a row's status to `archived` and offers Undo.
+- **Clock and timer:** the current time, and a study timer that stays pinned to the top. Start it from a category (Revision, DSA, LLD, Concurrency, Other) or from the ▶ next to a checklist item. Pause, resume, then **Stop & log** saves the minutes to the Sessions tab. The timer is saved in the sheet, so it keeps running across reloads and shows on every device you connect.
+- **Today's checklist:** your daily to-dos grouped by category, with the time logged for each category. **Edit list** adds items (every day, or today only), renames them, or removes them. Removing a daily item keeps it on past days, so your history stays right.
+- **Last 7 days:** items done and hours per day. Tap a day to see it, tick things you forgot, or add time.
+- **Time log:** the sessions for the selected day, plus a box to add time if you forgot the timer.
+
+The sheet's Plan, Goals, Problems, Cards, Mocks and DailyLog tabs are still there and still open to AI assistants and `tools/c26.mjs`. The page just doesn't show them any more.
 
 ## AI assistants
 
@@ -68,6 +68,6 @@ Using this for your own plan: edit `src/Seed.gs` (plan, goals, routine, cards, s
 | Source | What it is |
 |---|---|
 | `src/Server.gs` | Web API (`doPost` with token check), sheet menu, setup, reads, writes, reviews, LeetCode stats, ChangeLog |
-| `src/Seed.gs` | Tab layouts, the week-by-week plan, goals, routine, starter cards, settings, AI guide |
+| `src/Seed.gs` | Tab layouts, the starting daily checklist, the week-by-week plan, goals, routine, starter cards, settings, AI guide |
 | `src/Index.html` | The single-page app |
 | `src/preview-shim.js` | Fake Apps Script services for the local previews |

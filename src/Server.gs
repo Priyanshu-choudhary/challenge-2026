@@ -8,9 +8,9 @@
  */
 
 const APP_URL_ = 'https://priyanshu-choudhary.github.io/challenge-2026/';
-const KEYS_ = { Plan: 'id', Goals: 'id', Problems: 'id', Cards: 'id', Mocks: 'id', Sessions: 'id', DailyLog: 'date', Config: 'key' };
-const PREFIX_ = { Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: 'M-', Sessions: 'S-' };
-const APP_TABS_ = ['Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config'];
+const KEYS_ = { Checklist: 'id', Plan: 'id', Goals: 'id', Problems: 'id', Cards: 'id', Mocks: 'id', Sessions: 'id', DailyLog: 'date', Config: 'key' };
+const PREFIX_ = { Checklist: 'D-', Plan: 'T-', Goals: 'G-', Problems: 'P-', Cards: 'C-', Mocks: 'M-', Sessions: 'S-' };
+const APP_TABS_ = ['Checklist', 'Checks', 'Plan', 'Goals', 'Routine', 'Problems', 'Cards', 'DailyLog', 'Mocks', 'Sessions', 'Config'];
 const INTERVALS_ = [1, 3, 7, 14, 30, 60, 120];
 let TZ_ = null;
 let ACTOR_ = 'app'; // who ChangeLog credits; an API caller can name itself (e.g. "claude")
@@ -88,7 +88,8 @@ function doPost(e) {
       throw new Error('Not connected: this device has no valid token. In the sheet use Challenge 2026 > Connect a device.');
     }
     ACTOR_ = /^[a-z][a-z0-9-]{0,19}$/.test(req.actor || '') ? req.actor : 'app';
-    const api = { getAll: getAll, addRow: addRow, updateRow: updateRow, upsertDay: upsertDay, review: review, getLeetCode: getLeetCode };
+    const api = { getAll: getAll, addRow: addRow, updateRow: updateRow, upsertDay: upsertDay, review: review, getLeetCode: getLeetCode,
+      setCheck: setCheck, setTimer: setTimer };
     if (!Object.prototype.hasOwnProperty.call(api, req.fn)) throw new Error('Unknown function: ' + req.fn);
     out = { ok: true, result: api[req.fn].apply(null, Array.isArray(req.args) ? req.args : []) };
   } catch (err) {
@@ -280,6 +281,36 @@ function upsertDay(obj) {
       return updateRow_('DailyLog', obj.date, patch, ACTOR_, 'update');
     }
     return addRow_('DailyLog', obj, ACTOR_);
+  });
+}
+
+/** Ticks or unticks a checklist item for a date. Checks has one row per (date, item_id). */
+function setCheck(date, itemId, done) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) throw new Error('Bad date: ' + date);
+  return withLock_(() => {
+    const items = readTab_('Checklist');
+    const ik = items.headers.indexOf('id');
+    const itemRow = items.values.find(r => String(r[ik]).trim() === String(itemId));
+    if (!itemRow) throw new Error('Checklist has no item ' + itemId + '. Reload the app.');
+    const item = toObj_(items.headers, itemRow);
+    const { sh, headers, values } = readTab_('Checks');
+    const dk = headers.indexOf('date'), kk = headers.indexOf('item_id');
+    const i = values.findIndex(r => norm_(r[dk], 'date') === date && String(r[kk]).trim() === String(itemId));
+    const rec = { date: date, item_id: itemId, category: item.category, item: item.item, done: !!done,
+      done_at: done ? "'" + Utilities.formatDate(new Date(), tz_(), 'HH:mm') : '' };
+    if (i < 0) sh.appendRow(headers.map(h => clean_(rec[h])));
+    else headers.forEach((h, c) => { if (h === 'done' || h === 'done_at') sh.getRange(i + 2, c + 1).setValue(rec[h]); });
+    log_(ACTOR_, done ? 'check' : 'uncheck', 'Checks', itemId, date + ' ' + item.item);
+    rec.done_at = String(rec.done_at).replace(/^'/, '');
+    return rec;
+  });
+}
+
+/** Saves the shared study timer (a small JSON object) so every device sees the same timer. */
+function setTimer(state) {
+  return withLock_(() => {
+    setConfig_('timer', JSON.stringify(state || {}));
+    return state;
   });
 }
 

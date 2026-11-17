@@ -43,8 +43,6 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0 10px; }
 #clock { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; text-align: right; line-height: 1.1; }
 #clock-date { font-size: 13px; color: var(--muted); text-align: right; }
-.error { background: var(--warn-soft); color: var(--warn); padding: 10px 14px; border-radius: 10px; margin: 0 0 10px; }
-.error-text { color: var(--warn); }
 
 /* timer bar: always on screen */
 #timer { position: sticky; top: 0; z-index: 5; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06); }
@@ -96,20 +94,12 @@ header.top { display: flex; align-items: center; justify-content: space-between;
 .manual input[name="name"] { flex: 1; min-width: 140px; }
 .manual input[name="minutes"] { width: 90px; }
 
-#connect { max-width: 640px; }
-#connect .fields { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-#connect label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); }
-#connect .actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; }
-.steps { list-style: decimal; padding-left: 22px; margin: 10px 0 0; }
 footer { margin-top: 16px; font-size: 13px; color: var(--muted); display: flex; gap: 12px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
 
 #toast { position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 16px); opacity: 0; background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 30; display: flex; gap: 12px; align-items: center; max-width: calc(100% - 32px); }
 #toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 #toast.bad { background: var(--bad); color: #fff; }
 #toast button { background: transparent; color: inherit; border-color: currentColor; padding: 2px 10px; font-size: 13px; }
-#bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--accent), transparent); background-size: 50% 100%; background-repeat: no-repeat; opacity: 0; z-index: 40; transition: opacity 0.2s; }
-body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
-@keyframes slide { from { background-position: -50% 0; } to { background-position: 150% 0; } }
 
 @media (max-width: 560px) {
   #t-clock { font-size: 26px; min-width: 0; }
@@ -120,31 +110,14 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
 </style>
 </head>
 <body>
-<div id="bar"></div>
+
 <div class="wrap">
   <header class="top">
-    <div><h1>Challenge 2026</h1><div id="who" class="small muted"></div></div>
+    <div><h1>Challenge 2026</h1></div>
     <div><div id="clock">--:--:--</div><div id="clock-date"></div></div>
   </header>
-  <div id="app-error" class="error" hidden></div>
 
-  <section id="connect" class="panel" hidden>
-    <h2>Connect this device</h2>
-    <p class="muted">Your data stays in your own Google Sheet. Each device connects to it once.</p>
-    <ol class="steps">
-      <li>Open your tracker sheet. In the <b>Challenge 2026</b> menu choose <b>Connect a device</b>.</li>
-      <li>Open the connect link it shows on this device. Or paste the two values below.</li>
-    </ol>
-    <form id="f-connect" autocomplete="off">
-      <div class="fields">
-        <label>Web app URL <input name="url" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/.../exec" required></label>
-        <label>Connect token <input name="token" type="password" required></label>
-      </div>
-      <div class="actions"><span class="small" id="connect-note"></span><button class="primary">Connect</button></div>
-    </form>
-  </section>
-
-  <div id="app" hidden>
+  <div id="app">
     <section id="timer">
       <div id="t-clock">00:00</div>
       <div id="t-mid"></div>
@@ -179,8 +152,9 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
       </form>
     </section>
 
-    <footer><span>Data lives in your Google Sheet<span id="sheet-link"></span>.</span>
-      <button class="ghost small" data-act="disconnect" id="disconnect" hidden>Disconnect this device</button></footer>
+    <footer><span>Saved in this browser only. Back it up now and then; Restore loads a backup on any device.</span>
+      <span><button class="ghost small" data-act="backup">Backup</button> <button class="ghost small" data-act="restore">Restore</button>
+      <input type="file" id="restore-file" accept="application/json,.json" hidden></span></footer>
   </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -190,8 +164,8 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
   'use strict';
 
   var CATS = ['Revision', 'DSA', 'LLD', 'Concurrency', 'Other'];
-  var TABS = ['Checklist', 'Checks', 'Sessions', 'Config'];
-  var S = { tabs: null, date: null, today: null, edit: false, loadedAt: 0 };
+  var TABS = ['Checklist', 'Checks', 'Sessions'];
+  var S = { tabs: null, date: null, today: null, edit: false };
 
   // ---------- helpers ----------
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -210,7 +184,6 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
     return (h ? h + ':' + pad2(m) : pad2(m)) + ':' + pad2(s % 60);
   }
   function catVar(c) { return CATS.indexOf(c) >= 0 ? 'var(--c-' + c + ')' : 'var(--c-Other)'; }
-  function cfg(k) { var r = (S.tabs.Config || []).filter(function (x) { return x.key === k; })[0]; return r ? r.value : ''; }
   function store(k, v) { try { if (v == null) localStorage.removeItem('c26.' + k); else localStorage.setItem('c26.' + k, JSON.stringify(v)); } catch (e) { /* storage blocked */ } }
   function stored(k) { try { var s = localStorage.getItem('c26.' + k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
   function isDone(v) { return v === true || String(v).toUpperCase() === 'TRUE'; }
@@ -239,63 +212,65 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
     return { total: items.length, done: items.filter(function (it) { return checked(d, it.id); }).length, mins: minutesFor(d) };
   }
 
-  // ---------- server calls ----------
-  // Inside Apps Script (and the local preview) use google.script.run; on GitHub Pages POST to the
-  // Apps Script web app. The body is plain text, so the browser sends it without a CORS preflight.
-  var API_KEY = 'c26.api', memApi = null;
-  function hasGas() { return !!(window.google && google.script && google.script.run); }
-  function getApi() {
-    try { var s = localStorage.getItem(API_KEY); if (s) return JSON.parse(s); } catch (e) { /* storage blocked */ }
-    return memApi;
+  // ---------- storage: everything lives in this browser's localStorage ----------
+  var DATA_KEY = 'c26.data';
+  var SEED = [
+    ['Revision', 'Revise problems and cards that are due'],
+    ['DSA', 'Solve DSA problems'],
+    ['LLD', 'Solve 1 LLD question'],
+    ['Concurrency', 'Study 1 concurrency topic or problem'],
+  ];
+  var PREFIX = { Checklist: 'D-', Sessions: 'S-' };
+  function pad4(n) { return ('000' + n).slice(-4); }
+  function seedData() {
+    return {
+      Checklist: SEED.map(function (c, i) { return { id: 'D-' + pad4(i + 1), category: c[0], item: c[1], repeat: 'daily', start: '', end: '', status: 'active' }; }),
+      Checks: [], Sessions: [],
+    };
   }
-  function saveApi(a) {
-    memApi = a;
-    try { if (a) localStorage.setItem(API_KEY, JSON.stringify(a)); else localStorage.removeItem(API_KEY); } catch (e) { /* in-memory only */ }
+  function readData() {
+    var d = stored('data');
+    if (!d || typeof d !== 'object') return null;
+    TABS.forEach(function (t) { if (!Array.isArray(d[t])) d[t] = []; });
+    return d;
   }
-  function validApiUrl(u) { return /^https:\/\/script\.google\.com\/(a\/[^\/]+\/)?macros\/s\/[\w-]+\/exec$/.test(u); }
-  function call(fn) {
-    var args = Array.prototype.slice.call(arguments, 1);
-    if (hasGas()) {
-      return new Promise(function (resolve, reject) {
-        var runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
-        runner[fn].apply(runner, args);
-      });
+  var warned = false;
+  function persist() {
+    try {
+      localStorage.setItem(DATA_KEY, JSON.stringify({ Checklist: S.tabs.Checklist, Checks: S.tabs.Checks, Sessions: S.tabs.Sessions }));
+    } catch (e) {
+      if (!warned) { warned = true; toast('This browser is not letting the page save. Use Backup before you close it.', true); }
     }
-    var api = getApi();
-    if (!api) return Promise.reject(authError('This device is not connected yet.'));
-    return fetch(api.url, { method: 'POST', body: JSON.stringify({ token: api.token, fn: fn, args: args }) })
-      .then(function (r) { return r.text(); }, function () {
-        throw new Error('Could not reach your Apps Script. Open the web app URL in a private window: it should say "Challenge 2026 API is running".');
-      })
-      .then(function (text) {
-        var res;
-        try { res = JSON.parse(text); } catch (e) { throw new Error('Apps Script did not send data back. Is the deployment\'s access set to "Anyone"?'); }
-        if (!res.ok) throw /^Not connected/.test(res.error) ? authError(res.error) : new Error(res.error);
-        return res.result;
-      });
   }
-  function authError(msg) { var e = new Error(msg); e.auth = true; return e; }
-  var busyN = 0;
-  function busy(on) { busyN = Math.max(0, busyN + (on ? 1 : -1)); document.body.classList.toggle('busy', busyN > 0); }
-  // Resolves to the server result, or null after showing the error and reloading.
+  function nextId(tab) {
+    var max = 0;
+    S.tabs[tab].forEach(function (r) { var m = String(r.id || '').match(/(\d+)$/); if (m && !/^tmp-/.test(r.id)) max = Math.max(max, Number(m[1])); });
+    return PREFIX[tab] + pad4(max + 1);
+  }
+  function findIn(tab, id) { return S.tabs[tab].filter(function (r) { return String(r.id) === String(id); })[0]; }
+  // The actions the page performs. Callers update S.tabs in place; these fill in ids and details.
+  var LOCAL = {
+    addRow: function (tab, rec) { return Object.assign({}, rec, { id: nextId(tab) }); },
+    updateRow: function (tab, id, patch) {
+      var row = findIn(tab, id);
+      if (!row) throw new Error(tab + ' has no row ' + id + '.');
+      return Object.assign(row, patch);
+    },
+    setCheck: function (date, itemId, done) {
+      var it = findIn('Checklist', itemId) || {};
+      return { date: date, item_id: itemId, category: it.category, item: it.item, done: !!done, done_at: done ? hm(new Date()) : '' };
+    },
+  };
+  // Returns a promise of the result like before; saving runs right after the caller applies it.
   function write(fn, args, okMsg) {
-    busy(true);
-    return call.apply(null, [fn].concat(args)).then(function (res) {
-      busy(false);
-      if (okMsg) toast(typeof okMsg === 'function' ? okMsg(res) : okMsg);
-      return res;
-    }, function (err) {
-      busy(false);
-      var msg = err && err.message ? err.message : String(err);
-      if (/^Unknown function/.test(msg)) {
-        // The page is newer than the Apps Script it talks to: reloading would not help.
-        toast('Not saved: your Apps Script is out of date. Paste the new dist/Code.gs into Apps Script, then Deploy > Manage deployments > Edit > New version.', true);
-        return null;
-      }
-      toast('Not saved: ' + msg + ' Reloading.', true);
-      load(true);
-      return null;
-    });
+    var res;
+    try { res = LOCAL[fn].apply(null, args); } catch (err) {
+      toast('Not saved: ' + (err && err.message ? err.message : err), true);
+      return Promise.resolve(null);
+    }
+    setTimeout(persist, 0);
+    if (okMsg) toast(typeof okMsg === 'function' ? okMsg(res) : okMsg);
+    return Promise.resolve(res);
   }
   function toast(msg, bad, action) {
     var t = $('#toast');
@@ -311,47 +286,50 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
     clearTimeout(toast.timer);
     toast.timer = setTimeout(function () { t.className = ''; }, action ? 8000 : bad ? 6000 : 2600);
   }
-
-  function load(quiet) {
-    if (!quiet) busy(true);
-    return call('getAll').then(function (d) {
-      if (!quiet) busy(false);
-      TABS.forEach(function (t) { d.tabs[t] = d.tabs[t] || []; });
-      S.tabs = d.tabs;
-      S.loadedAt = Date.now();
-      $('#app-error').hidden = true;
-      $('#who').textContent = cfg('name') || '';
-      if (d.sheetUrl) $('#sheet-link').innerHTML = ' (<a href="' + esc(/^https:\/\//.test(d.sheetUrl) ? d.sheetUrl : '#') + '" target="_blank" rel="noopener">open it</a>)';
-      syncTimerFromServer();
-      renderAll();
-    }, function (err) {
-      if (!quiet) busy(false);
-      if (err && err.auth) { saveApi(null); showConnect(err.message); return; }
-      var box = $('#app-error');
-      box.hidden = false;
-      box.textContent = 'Could not load the sheet: ' + (err && err.message ? err.message : err);
-    });
+  function load() {
+    var d = readData();
+    S.tabs = d || seedData();
+    if (!d) persist();
+    renderAll();
   }
 
-  // ---------- timer (shared through the sheet, so every device sees the same one) ----------
+  // ---------- backup and restore (a JSON file) ----------
+  function backup() {
+    var blob = new Blob([JSON.stringify({ app: 'challenge-2026', version: 1, exported: new Date().toISOString(),
+      data: { Checklist: S.tabs.Checklist, Checks: S.tabs.Checks, Sessions: S.tabs.Sessions }, timer: T }, null, 1)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'challenge-2026-backup-' + today() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function restore(file) {
+    var r = new FileReader();
+    r.onload = function () {
+      var o;
+      try { o = JSON.parse(r.result); } catch (e) { o = null; }
+      var d = o && o.data;
+      if (!d || !TABS.every(function (t) { return Array.isArray(d[t]); })) { toast('That file is not a Challenge 2026 backup.', true); return; }
+      var n = d.Checklist.length + ' items, ' + d.Sessions.length + ' sessions';
+      if (!window.confirm('Replace everything on this page with the backup (' + n + ')?')) return;
+      S.tabs = { Checklist: d.Checklist, Checks: d.Checks, Sessions: d.Sessions };
+      persist();
+      if (o.timer && o.timer.status) { T = Object.assign({}, IDLE, o.timer); $('#timer').dataset.sig = ''; pushTimer(true); }
+      renderAll();
+      toast('Restored ' + n + '.');
+    };
+    r.readAsText(file);
+  }
+
+  // ---------- timer (kept in localStorage, so it survives reloads and is shared by open tabs) ----------
   var IDLE = { status: 'idle', category: '', label: '', itemId: '', startedAt: 0, accMs: 0, firstStart: 0, updated: 0 };
   var T = Object.assign({}, IDLE, stored('timer2') || {});
 
   function elapsed() { return T.accMs + (T.status === 'running' ? Math.max(0, Date.now() - T.startedAt) : 0); }
-  function syncTimerFromServer() {
-    var remote = null;
-    try { remote = cfg('timer') ? JSON.parse(cfg('timer')) : null; } catch (e) { remote = null; }
-    if (remote && num(remote.updated) > num(T.updated)) T = Object.assign({}, IDLE, remote);
-    else if (num(T.updated) > num(remote && remote.updated)) pushTimer(true);
-    store('timer2', T);
-  }
   function pushTimer(keepStamp) {
     if (!keepStamp) T.updated = Date.now();
     store('timer2', T);
-    var copy = Object.assign({}, T);
-    var row = S.tabs.Config.filter(function (x) { return x.key === 'timer'; })[0];
-    if (row) row.value = JSON.stringify(copy); else S.tabs.Config.push({ key: 'timer', value: JSON.stringify(copy) });
-    write('setTimer', [copy]);
     renderTimer();
   }
   function startTimer(cat, label, itemId) {
@@ -525,39 +503,7 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
     });
   }
 
-  // ---------- connecting a device ----------
-  function showConnect(msg) {
-    $('#app').hidden = true;
-    $('#connect').hidden = false;
-    $('#app-error').hidden = true;
-    $('#who').textContent = 'Not connected on this device';
-    var note = $('#connect-note');
-    note.textContent = msg || '';
-    note.className = 'small' + (msg ? ' error-text' : '');
-  }
-  function start() {
-    if (!hasGas() && !getApi()) { showConnect(); return; }
-    $('#connect').hidden = true;
-    $('#app').hidden = false;
-    $('#disconnect').hidden = hasGas();
-    load();
-  }
-  // A connect link looks like <app>#connect=<base64 of {"u": web app URL, "t": token}>.
-  function readConnectHash() {
-    var m = location.hash.match(/^#connect=(.+)$/);
-    if (!m) return null;
-    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
-    try {
-      var o = JSON.parse(atob(decodeURIComponent(m[1])));
-      if (!validApiUrl(o.u) || !o.t) throw new Error('bad link');
-      saveApi({ url: o.u, token: o.t });
-      toast('This device is connected.');
-      return 'ok';
-    } catch (e) {
-      showConnect('That connect link is broken or uses a /dev URL. Make a new one from the sheet menu.');
-      return 'bad';
-    }
-  }
+  function start() { load(); }
 
   // ---------- clock and ticking ----------
   function tick() {
@@ -596,12 +542,8 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
         s.status = 'archived';
         renderAll();
         write('updateRow', ['Sessions', id, { status: 'archived' }], 'Removed.');
-      } else if (act === 'disconnect') {
-        if (!window.confirm('Disconnect this device? You can reconnect with a connect link from the sheet.')) return;
-        saveApi(null);
-        S.tabs = null;
-        showConnect();
-      }
+      } else if (act === 'backup') backup();
+      else if (act === 'restore') $('#restore-file').click();
     });
     document.addEventListener('change', function (e) {
       var el = e.target;
@@ -612,6 +554,7 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
         it.item = v;
         write('updateRow', ['Checklist', it.id, { item: v }], 'Renamed.');
       } else if (el.id === 't-label') { T.label = el.value.trim(); pushTimer(); }
+      else if (el.id === 'restore-file') { if (el.files[0]) restore(el.files[0]); el.value = ''; }
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && e.target.id === 't-label') e.target.blur();
@@ -634,20 +577,13 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
         write('addRow', ['Sessions', rec], 'Added ' + fmtMins(mins) + '.').then(function (saved) {
           if (saved) { S.tabs.Sessions.push(saved); renderAll(); }
         });
-      } else if (f.id === 'f-connect') {
-        e.preventDefault();
-        var url = f.elements.url.value.trim(), token = f.elements.token.value.trim();
-        if (!validApiUrl(url)) { showConnect('The URL should look like https://script.google.com/macros/s/.../exec'); return; }
-        saveApi({ url: url, token: token });
-        f.reset();
-        start();
       }
     });
-    // Pick up changes made on another device (including its timer) when you come back to this tab.
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'visible' && S.tabs && Date.now() - S.loadedAt > 10000) load(true);
+    // Another tab of this page changed something: show it here too.
+    window.addEventListener('storage', function (e) {
+      if (e.key === DATA_KEY) { var d = readData(); if (d) { S.tabs = d; renderAll(); } }
+      else if (e.key === 'c26.timer2') { T = Object.assign({}, IDLE, stored('timer2') || {}); $('#timer').dataset.sig = ''; renderTimer(); }
     });
-    window.addEventListener('hashchange', function () { if (readConnectHash() === 'ok') start(); });
   }
 
   $('#f-manual').elements.category.innerHTML = CATS.map(function (c) { return '<option>' + c + '</option>'; }).join('');
@@ -656,7 +592,7 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
   bindEvents();
   tick();
   setInterval(tick, 500);
-  if (readConnectHash() !== 'bad') start();
+  start();
 })();
 </script>
 </body>

@@ -1,54 +1,23 @@
 # Challenge 2026
 
-A one-page tracker for a placement-season prep plan (DSA, LLD, CS fundamentals, HLD), backed by a Google Sheet that you, the app and any AI assistant can all read and edit.
+A one-page daily tracker for placement prep: a checklist for Revision, DSA, LLD, Concurrency and Other, a study timer and a clock.
 
-- **App:** https://priyanshu-choudhary.github.io/challenge-2026/ (a static page; it shows a connect screen until you link it to your own sheet)
-- **Data:** your own Google Sheet, with a small Apps Script API in front of it ([dist/Code.gs](dist/Code.gs))
-- **The plan:** [PLAN.md](PLAN.md), 13 weeks to interview-ready, then interview season
-
-## How it fits together
-
-```
-GitHub Pages (docs/index.html)  --POST, token-->  Apps Script web app (dist/Code.gs)  -->  Google Sheet tabs
-AI assistants (Claude, Gemini, ...)  ------------------ edit the sheet directly, following its AI_GUIDE tab --^
-```
-
-No data or secrets live in this repository. The page stores the web app URL and a connect token in your browser only.
-
-## Setup
-
-1. Create a Google Sheet, open **Extensions > Apps Script**, replace `Code.gs` with [dist/Code.gs](dist/Code.gs), and save.
-2. Pick **setup** in the function menu and press **Run**. Allow access; Google warns that the app isn't verified because it's your own script (**Advanced > Go to project > Allow**). The sheet gets its tabs, the plan and starter interview cards.
-3. **Deploy > New deployment > Web app**. Execute as: **Me**. Who has access: **Anyone**. Deploy.
-   Already deployed with "Only myself"? Use **Deploy > Manage deployments > Edit**, choose **New version**, set access to **Anyone**, and deploy. The URL stays the same.
-4. Get your connect link, either way:
-   - In the Apps Script editor press **Run** (the default function is `showConnectLink`). The **Execution log** prints the web app URL, the token and a ready connect link.
-   - Or reload the sheet and choose **Challenge 2026 > Connect a device**.
-
-   Open the link once on each device you use (send it to your phone privately). `showConnectLink` first checks that the URL answers; if it reports a problem (the editor sometimes reports its own test URL, which gives a 404), copy the Web app URL from **Manage deployments** into the Config tab row `api_url` and run it again.
-
-Why "Anyone" is safe here: the web app serves no page and no data without the connect token, which is a random 64-character value kept in the script's properties. **Challenge 2026 > New connect token** replaces it and signs out every device.
+- **App:** https://priyanshu-choudhary.github.io/challenge-2026/
+- **Data:** saved in your browser's local storage only. Nothing is sent to Google Drive, Sheets or any server.
+- **The plan:** [PLAN.md](PLAN.md), 13 weeks to interview-ready
 
 ## Daily use
 
 The page is one screen:
 
-- **Clock and timer:** the current time, and a study timer that stays pinned to the top. Start it from a category (Revision, DSA, LLD, Concurrency, Other) or from the ▶ next to a checklist item. Pause, resume, then **Stop & log** saves the minutes to the Sessions tab. The timer is saved in the sheet, so it keeps running across reloads and shows on every device you connect.
+- **Clock and timer:** the current time, and a study timer that stays pinned to the top. Start it from a category (Revision, DSA, LLD, Concurrency, Other) or from the ▶ next to a checklist item. Pause, resume, then **Stop & log** saves the minutes to the time log. The timer keeps running across reloads, and every open tab of the page shows the same timer.
 - **Today's checklist:** your daily to-dos grouped by category, with the time logged for each category. **Edit list** adds items (every day, or today only), renames them, or removes them. Removing a daily item keeps it on past days, so your history stays right.
 - **Last 7 days:** items done and hours per day. Tap a day to see it, tick things you forgot, or add time.
 - **Time log:** the sessions for the selected day, plus a box to add time if you forgot the timer.
 
-The sheet's Plan, Goals, Problems, Cards, Mocks and DailyLog tabs are still there and still open to AI assistants and `tools/c26.mjs`. The page just doesn't show them any more.
+### Your data
 
-## AI assistants
-
-The sheet's **AI_GUIDE** tab tells any assistant the rules (append only, soft delete, allowed values, the review formula) and to log each change in **ChangeLog**. **File > Version history** undoes anything. Give the assistant access to the sheet (Claude's Google Sheets connector, Gemini in Sheets, or any tool with Drive or Sheets access) and start with:
-
-> Read my Google Sheet "Challenge 2026 Tracker", starting with the AI_GUIDE tab, and follow its rules. Then tell me what to focus on today.
-
-A full prompt kit (daily, planning, reviews, mock interviews) is in [PROMPTS.md](PROMPTS.md).
-
-Coding agents with a shell can use [tools/c26.mjs](tools/c26.mjs) instead of sheet access: put the web app URL and token in a git-ignored `.c26.json` ({"url": "...", "token": "..."}) and run `node tools/c26.mjs today`. Their edits show in ChangeLog under their own name (set C26_ACTOR, default claude).
+Everything is stored in this browser's local storage (keys `c26.data` and `c26.timer2`). It does not sync between devices or browsers, and clearing site data or using a private window loses it. **Backup** (bottom of the page) downloads a JSON file; **Restore** loads one, on this or any other device.
 
 ## Development
 
@@ -57,11 +26,13 @@ Edit `src/`, then run `node build.mjs`. It writes:
 | Output | What it is |
 |---|---|
 | `dist/Code.gs` | The Apps Script file to paste (server code plus the plan seed) |
-| `docs/index.html` | The page GitHub Pages serves |
+| `docs/index.html` | The page GitHub Pages serves (self-contained, no server) |
 | `preview/index.html`, `preview/fetch.html` | Local test pages running the real server code against a fake in-memory sheet (ignored by git) |
 | `PLAN.md` | A readable copy of the plan |
 
-After changing the server, paste the new `dist/Code.gs` and publish a new version under **Manage deployments**. After changing the page, push to `main`; Pages redeploys `docs/`.
+After changing the page, push to `main`; Pages redeploys `docs/`.
+
+The Google Sheet backend (`src/Server.gs`, `src/Seed.gs`, `dist/Code.gs`, `tools/c26.mjs`) is no longer used by the page. It is kept for reference only.
 
 Using this for your own plan: edit `src/Seed.gs` (plan, goals, routine, cards, settings) and `APP_URL_` in `src/Server.gs`.
 

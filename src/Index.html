@@ -286,7 +286,13 @@ body.busy #bar { opacity: 1; animation: slide 1s linear infinite; }
       return res;
     }, function (err) {
       busy(false);
-      toast('Not saved: ' + (err && err.message ? err.message : err) + ' Reloading.', true);
+      var msg = err && err.message ? err.message : String(err);
+      if (/^Unknown function/.test(msg)) {
+        // The page is newer than the Apps Script it talks to: reloading would not help.
+        toast('Not saved: your Apps Script is out of date. Paste the new dist/Code.gs into Apps Script, then Deploy > Manage deployments > Edit > New version.', true);
+        return null;
+      }
+      toast('Not saved: ' + msg + ' Reloading.', true);
       load(true);
       return null;
     });

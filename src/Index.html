@@ -10,14 +10,14 @@
 :root {
   --bg: #f5f6f8; --card: #ffffff; --ink: #1b1f29; --muted: #667085; --line: #e3e6eb; --soft: #f0f2f5;
   --accent: #3355d6; --ok: #1f8a4c; --ok-soft: #e3f4ea; --warn: #c2410c; --warn-soft: #fdecdf; --bad: #c42b2b;
-  --c-Revision: #c2410c; --c-DSA: #3355d6; --c-LLD: #7a45d6; --c-Concurrency: #0e7f8f; --c-Other: #5f6b7a;
+  --c-Revision: #c2410c; --c-DSA: #3355d6; --c-LLD: #7a45d6; --c-Concurrency: #0e7f8f; --c-Other: #5f6b7a; --c-GATE: #c2255c;
   --radius: 12px;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0e1116; --card: #161a22; --ink: #e7eaf0; --muted: #98a2b3; --line: #262c38; --soft: #1e232d;
     --accent: #7d95ff; --ok: #4cc38a; --ok-soft: #13291e; --warn: #f0894a; --warn-soft: #2e1d12; --bad: #ff6b6b;
-    --c-Revision: #e07a3f; --c-DSA: #6f86f0; --c-LLD: #9a73ea; --c-Concurrency: #23a5b6; --c-Other: #8591a3;
+    --c-Revision: #e07a3f; --c-DSA: #6f86f0; --c-LLD: #9a73ea; --c-Concurrency: #23a5b6; --c-Other: #8591a3; --c-GATE: #e0508a;
   }
 }
 * { box-sizing: border-box; }
@@ -163,7 +163,7 @@ footer { margin-top: 16px; font-size: 13px; color: var(--muted); display: flex; 
 (function () {
   'use strict';
 
-  var CATS = ['Revision', 'DSA', 'LLD', 'Concurrency', 'Other'];
+  var CATS = ['Revision', 'DSA', 'LLD', 'Concurrency', 'Other', 'GATE'];
   var TABS = ['Checklist', 'Checks', 'Sessions'];
   var S = { tabs: null, date: null, today: null, edit: false };
 
@@ -219,6 +219,7 @@ footer { margin-top: 16px; font-size: 13px; color: var(--muted); display: flex; 
     ['DSA', 'Solve DSA problems'],
     ['LLD', 'Solve 1 LLD question'],
     ['Concurrency', 'Study 1 concurrency topic or problem'],
+    ['GATE', 'Study 1 GATE topic'],
   ];
   var PREFIX = { Checklist: 'D-', Sessions: 'S-' };
   function pad4(n) { return ('000' + n).slice(-4); }
@@ -289,8 +290,19 @@ footer { margin-top: 16px; font-size: 13px; color: var(--muted); display: flex; 
   function load() {
     var d = readData();
     S.tabs = d || seedData();
-    if (!d) persist();
+    if (!d) { persist(); store('added.gate', 1); }
+    addGateOnce();
     renderAll();
+  }
+
+  // Lists made before GATE existed get its daily item once; removing it later keeps it removed.
+  function addGateOnce() {
+    if (stored('added.gate')) return;
+    if (!S.tabs.Checklist.some(function (it) { return it.category === 'GATE'; })) {
+      S.tabs.Checklist.push({ id: nextId('Checklist'), category: 'GATE', item: 'Study 1 GATE topic', repeat: 'daily', start: today(), end: '', status: 'active' });
+      persist();
+    }
+    store('added.gate', 1);
   }
 
   // ---------- backup and restore (a JSON file) ----------

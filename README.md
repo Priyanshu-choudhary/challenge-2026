@@ -1,6 +1,6 @@
 # Challenge 2026
 
-A one-page daily tracker for placement prep: a checklist for Revision, DSA, LLD, Concurrency and Other, a study timer and a clock.
+A one-page daily tracker for placement prep: a checklist for Revision, DSA, LLD, Concurrency, Other and GATE, a study timer and a clock.
 
 - **App:** https://priyanshu-choudhary.github.io/challenge-2026/
 - **Data:** saved in your browser's local storage only. Nothing is sent to Google Drive, Sheets or any server.
@@ -10,7 +10,7 @@ A one-page daily tracker for placement prep: a checklist for Revision, DSA, LLD,
 
 The page is one screen:
 
-- **Clock and timer:** the current time, and a study timer that stays pinned to the top. Start it from a category (Revision, DSA, LLD, Concurrency, Other) or from the ▶ next to a checklist item. Pause, resume, then **Stop & log** saves the minutes to the time log. The timer keeps running across reloads, and every open tab of the page shows the same timer.
+- **Clock and timer:** the current time, and a study timer that stays pinned to the top. Start it from a category (Revision, DSA, LLD, Concurrency, Other, GATE) or from the ▶ next to a checklist item. Pause, resume, then **Stop & log** saves the minutes to the time log. The timer keeps running across reloads, and every open tab of the page shows the same timer.
 - **Today's checklist:** your daily to-dos grouped by category, with the time logged for each category. **Edit list** adds items (every day, or today only), renames them, or removes them. Removing a daily item keeps it on past days, so your history stays right.
 - **Last 7 days:** items done and hours per day. Tap a day to see it, tick things you forgot, or add time.
 - **Time log:** the sessions for the selected day, plus a box to add time if you forgot the timer.
